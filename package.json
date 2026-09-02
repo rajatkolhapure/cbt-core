@@ -7,7 +7,11 @@
     "serve": "npm run start --workspace=server",
     "dev": "npm run dev:server & npm run dev:client",
     "dev:client": "cd client && npm run dev",
-    "dev:server": "cd server && npm run dev"
+    "dev:server": "cd server && npm run dev",
+    "db:generate": "npm run db:generate --workspace=server",
+    "db:migrate": "npm run db:migrate --workspace=server",
+    "db:seed": "npm run db:seed --workspace=server",
+    "db:studio": "npm run db:studio --workspace=server"
   },
   "workspaces": ["client", "server"]
 }

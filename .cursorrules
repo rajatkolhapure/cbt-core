@@ -1,0 +1,10 @@
+# CBT Platform — Developer & AI Rules
+
+Follow the authoritative project rules defined in `.antigravity/rules.md`:
+1. Single Express server on port 8080 serving client/dist static assets.
+2. Design System: "Vintage Technical Instrument & Academic Journal" theme.
+   - Fonts: Newsreader / Playfair Display (Serif), IBM Plex Mono (Monospace), Inter (Sans).
+   - Colors: Parchment #FBF9F5, Inset wells #F4EFEA, Ink #1C1D21, Ochre Gold #C88A2D, Royal Ink #1A2B4C, Emerald #236B47, Crimson #A83232.
+   - Tactile buttons with shadow-[2px_2px_0px_0px_#1C1D21] and mechanical active depress.
+3. Registration is disabled; Admin name is Rajat Kolhapure (admin@cbt.com).
+4. Always verify TypeScript builds (`npm run build` in client and server) before staging commits.
