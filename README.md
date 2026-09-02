@@ -4,7 +4,7 @@
 
 ---
 
-## ⚡ Quick Start for Collaborators
+##  Quick Start for Collaborators
 
 Follow these steps to set up and run the platform locally on your machine.
 
@@ -16,8 +16,8 @@ Follow these steps to set up and run the platform locally on your machine.
 ### 2. Installation
 Clone the repository and install all dependencies (root, client, and server workspaces):
 ```bash
-git clone <YOUR_GITHUB_REPO_URL>
-cd cbt
+git clone https://github.com/anish455/CBT.git
+cd CBT
 npm install
 ```
 
@@ -52,11 +52,11 @@ Build the frontend client bundle and start the unified server on **port 8080**:
 npm run start
 ```
 Open your browser and navigate to:
-👉 **[http://localhost:8080](http://localhost:8080)**
+ **[http://localhost:8080](http://localhost:8080)**
 
 ---
 
-## 🔑 Pre-Configured Test Accounts
+##  Pre-Configured Test Accounts
 
 | Role | Name | Email | Password | Details |
 |---|---|---|---|---|
@@ -64,11 +64,11 @@ Open your browser and navigate to:
 | **Student 1** | Priya Sharma | `student@cbt.com` | `student123` | Roll No: `CET-2026-0001` |
 | **Student 2** | Parth Jagdale | `parth@cbt.com` | `student123` | Roll No: `CET-2026-0004` |
 
-> ⚠️ **Notice**: Public user self-registration is strictly disabled. New candidates must be created by the administrator.
+>  **Notice**: Public user self-registration is strictly disabled. New candidates must be created by the administrator.
 
 ---
 
-## 🏛️ System Architecture
+##  System Architecture
 
 ```
 cbt/
@@ -97,7 +97,7 @@ cbt/
 
 ---
 
-## 🛡️ Core Capabilities & Features
+##  Core Capabilities & Features
 
 1. **Single-Port Architecture**:
    - Both the API and static React frontend run on **port 8080** for zero-CORS issues and instant Cloudflare tunneling.
@@ -114,12 +114,5 @@ cbt/
 4. **Dual-Mode Live Proctoring Terminal (`/admin/live`)**:
    - **Mode 1 (Command Center)**: High-density card grid for monitoring large cohorts with live progress bars and LED status indicators.
    - **Mode 2 (Personal Focus)**: 1-on-1 deep-dive with live answer heatmap matrix, chronological integrity stream, custom warning dispatch, time extension (`+5` to `+30` min), and force termination.
-5. **Design System**:
-   - "Vintage Technical Instrument & Academic Journal" theme.
-   - Warm newsprint paper canvas (`#FBF9F5`), crisp ink rules (`#1C1D21`), tactile offset shadows (`shadow-[2px_2px_0px_0px_#1C1D21]`), and mechanical push-buttons (`.btn-tactile`).
 
----
 
-## 🤝 Collaborating with Git & Antigravity
-
-See [**`CONTRIBUTING.md`**](file:///c:/Users/rmk19/OneDrive/Documents/cbt/CONTRIBUTING.md) for our team branch workflow, AI coding rules, and database migration guidelines.
