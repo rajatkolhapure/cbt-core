@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Newsreader", "Playfair Display", Georgia, serif;
+  --font-display: "Playfair Display", "Newsreader", Georgia, serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", Menlo, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --color-parchment: #FBF9F5;
+  --color-parchment-light: #FFFFFF;
+  --color-parchment-surface: #F4EFEA;
+  --color-parchment-inset: #EBE5DC;
+  
+  --color-ink: #1C1D21;
+  --color-ink-muted: #575A65;
+  --color-ink-faint: #8E929E;
+  --color-ink-rule: #DCD6CD;
+
+  --color-royal-ink: #1A2B4C;
+  --color-royal-ink-hover: #121F38;
+  --color-ochre-gold: #C88A2D;
+  --color-ochre-light: #FBF3E4;
+  
+  --color-emerald-signal: #236B47;
+  --color-emerald-light: #EBF5F0;
+  --color-crimson-seal: #A83232;
+  --color-crimson-light: #FDF0F0;
+  --color-amber-lamp: #D97706;
+  --color-amber-light: #FEF8ED;
+
+  --color-terminal-bg: #141619;
+  --color-terminal-panel: #1D2026;
+  --color-terminal-border: #2E323B;
+  --color-terminal-screen: #0C0D0F;
+}
+
+/* ─── Mechanical & Tactile Utilities ────────────────────────────────────────── */
+
+/* Tactile solid offset shadow */
+.shadow-tactile {
+  box-shadow: 2px 2px 0px 0px #1C1D21;
+}
+
+.shadow-tactile-lg {
+  box-shadow: 3px 3px 0px 0px #1C1D21;
+}
+
+.shadow-tactile-gold {
+  box-shadow: 2px 2px 0px 0px #C88A2D;
+}
+
+.shadow-tactile-emerald {
+  box-shadow: 2px 2px 0px 0px #236B47;
+}
+
+.shadow-tactile-crimson {
+  box-shadow: 2px 2px 0px 0px #A83232;
+}
+
+/* Mechanical Push Button Behavior */
+.btn-tactile {
+  border: 1px solid #1C1D21;
+  box-shadow: 2px 2px 0px 0px #1C1D21;
+  transition: transform 75ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 75ms cubic-bezier(0.16, 1, 0.3, 1), background-color 75ms ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-tactile:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px 0px #1C1D21;
+}
+
+.btn-tactile:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Crisp Paper Card Surface */
+.card-tactile {
+  background-color: #FFFFFF;
+  border: 1px solid #1C1D21;
+  box-shadow: 3px 3px 0px 0px #1C1D21;
+}
+
+/* Inset Technical Well */
+.well-tactile {
+  background-color: #F4EFEA;
+  border: 1px solid rgba(28, 29, 33, 0.15);
+  box-shadow: inset 1px 1px 2px 0px rgba(0, 0, 0, 0.06);
+}
+
+/* Dark Terminal Instrument Surface */
+.terminal-tactile {
+  background-color: #141619;
+  border: 1px solid #2E323B;
+  box-shadow: 3px 3px 0px 0px #0C0D0F;
+}
+
+/* Custom Scrollbar for Vintage Telemetry */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EFEA;
+  border-left: 1px solid #DCD6CD;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8E929E;
+  border: 1px solid #1C1D21;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #575A65;
+}
+
+/* Snappy Animations */
+@keyframes technicalPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.98); }
+}
+
+@keyframes shutterFade {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-shutter {
+  animation: shutterFade 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-tech-pulse {
+  animation: technicalPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

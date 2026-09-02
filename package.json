@@ -1,0 +1,13 @@
+{
+  "name": "cbt-platform",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --workspace=client",
+    "start": "npm run build --workspace=client && npm run start --workspace=server",
+    "serve": "npm run start --workspace=server",
+    "dev": "npm run dev:server & npm run dev:client",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev"
+  },
+  "workspaces": ["client", "server"]
+}

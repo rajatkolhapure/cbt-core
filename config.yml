@@ -1,0 +1,8 @@
+tunnel: b1a6e966-bbd5-43a2-957d-386c0913dc0c
+credentials-file: C:\Users\rmk19\.cloudflared\b1a6e966-bbd5-43a2-957d-386c0913dc0c.json
+
+ingress:
+  - hostname: cbt.rajatkolhapure.me
+    service: http://localhost:8080
+
+  - service: http_status:404

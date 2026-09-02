@@ -1,0 +1,332 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  NUMERICAL
+}
+
+enum AttemptState {
+  NOT_STARTED
+  READY
+  IN_PROGRESS
+  PAUSED
+  SUBMITTED
+  EVALUATED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ExamEnvironment {
+  STANDARD_BROWSER
+  FULLSCREEN_BROWSER
+  KIOSK_CLIENT
+}
+
+enum IntegrityEventType {
+  EXAM_STARTED
+  EXAM_SUBMITTED
+  EXAM_AUTO_SUBMITTED
+  QUESTION_VIEWED
+  ANSWER_SAVED
+  FULLSCREEN_EXIT
+  FULLSCREEN_ENTER
+  WINDOW_BLUR
+  WINDOW_FOCUS
+  VISIBILITY_HIDDEN
+  VISIBILITY_VISIBLE
+  COPY_ATTEMPT
+  PASTE_ATTEMPT
+  CUT_ATTEMPT
+  PRINT_ATTEMPT
+  CONTEXT_MENU_ATTEMPT
+  DEVTOOLS_OPEN
+  SESSION_CONNECTED
+  SESSION_DISCONNECTED
+  SESSION_RECONNECTED
+  TIME_WARNING
+  TIME_EXPIRED
+  SUSPICIOUS_HARDWARE
+  MULTI_MONITOR_ON_LOGIN
+  CURSOR_TELEPORTATION_DETECTED
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  name        String
+  role        Role     @default(STUDENT)
+  candidateId String?  @unique @map("candidate_id")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  attempts         Attempt[]
+  examAssignments  ExamAssignment[]
+  examSessions     ExamSession[]
+  integrityEvents  IntegrityEvent[]
+  hardwareProfiles HardwareProfile[]
+
+  @@map("users")
+}
+
+model Subject {
+  id    String @id @default(uuid())
+  name  String @unique
+  code  String @unique
+  order Int    @default(0)
+
+  chapters     Chapter[]
+  questions    Question[]
+  examSections ExamSection[]
+
+  @@map("subjects")
+}
+
+model Chapter {
+  id        String @id @default(uuid())
+  name      String
+  subjectId String @map("subject_id")
+
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questions Question[]
+
+  @@unique([subjectId, name])
+  @@map("chapters")
+}
+
+model Question {
+  id             String       @id @default(uuid())
+  type           QuestionType
+  text           String
+  options        Json?        // Array of option objects for MCQ types
+  correctAnswer  Json         @map("correct_answer") // Index for single, array for multiple, number for numerical
+  marks          Float        @default(4)
+  negativeMarks  Float        @default(1) @map("negative_marks")
+  difficulty     Difficulty   @default(MEDIUM)
+  explanation    String?
+  imageUrl       String?      @map("image_url")
+  tags           String[]     @default([])
+  isActive       Boolean      @default(true) @map("is_active")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  subjectId String  @map("subject_id")
+  chapterId String? @map("chapter_id")
+
+  subject      Subject        @relation(fields: [subjectId], references: [id])
+  chapter      Chapter?       @relation(fields: [chapterId], references: [id])
+  examQuestions ExamQuestion[]
+  answers      Answer[]
+
+  @@index([subjectId])
+  @@index([chapterId])
+  @@index([type])
+  @@index([difficulty])
+  @@map("questions")
+}
+
+model Exam {
+  id                String          @id @default(uuid())
+  title             String
+  description       String?
+  duration          Int             // Duration in minutes
+  totalMarks        Float           @map("total_marks")
+  isPublished       Boolean         @default(false) @map("is_published")
+  shuffleQuestions  Boolean         @default(false) @map("shuffle_questions")
+  shuffleOptions    Boolean         @default(false) @map("shuffle_options")
+  allowReview       Boolean         @default(true) @map("allow_review")
+  showResultImmediately Boolean     @default(true) @map("show_result_immediately")
+  integrityPolicy   Json?           @map("integrity_policy") // JSON config for integrity rules
+  examEnvironment   ExamEnvironment @default(STANDARD_BROWSER) @map("exam_environment")
+  scheduledStart    DateTime?       @map("scheduled_start")
+  scheduledEnd      DateTime?       @map("scheduled_end")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  sections      ExamSection[]
+  assignments   ExamAssignment[]
+  attempts      Attempt[]
+  examQuestions ExamQuestion[]
+
+  @@map("exams")
+}
+
+model ExamSection {
+  id                       String @id @default(uuid())
+  examId                   String @map("exam_id")
+  subjectId                String @map("subject_id")
+  name                     String
+  order                    Int    @default(0)
+  questionCount            Int    @map("question_count")
+  marksPerQuestion         Float  @default(4) @map("marks_per_question")
+  negativeMarksPerQuestion Float  @default(1) @map("negative_marks_per_question")
+  allowSectionJump         Boolean @default(true) @map("allow_section_jump")
+
+  exam      Exam           @relation(fields: [examId], references: [id], onDelete: Cascade)
+  subject   Subject        @relation(fields: [subjectId], references: [id])
+  questions ExamQuestion[]
+
+  @@unique([examId, order])
+  @@map("exam_sections")
+}
+
+model ExamQuestion {
+  id         String @id @default(uuid())
+  examId     String @map("exam_id")
+  sectionId  String @map("section_id")
+  questionId String @map("question_id")
+  order      Int    @default(0)
+
+  exam     Exam        @relation(fields: [examId], references: [id], onDelete: Cascade)
+  section  ExamSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id])
+  answers  Answer[]
+
+  @@unique([sectionId, order])
+  @@unique([sectionId, questionId])
+  @@map("exam_questions")
+}
+
+model ExamAssignment {
+  id         String   @id @default(uuid())
+  examId     String   @map("exam_id")
+  userId     String   @map("user_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, userId])
+  @@map("exam_assignments")
+}
+
+model Attempt {
+  id              String       @id @default(uuid())
+  examId          String       @map("exam_id")
+  userId          String       @map("user_id")
+  state           AttemptState @default(NOT_STARTED)
+  startedAt       DateTime?    @map("started_at")
+  submittedAt     DateTime?    @map("submitted_at")
+  serverEndTime   DateTime?    @map("server_end_time") // Server-authoritative deadline
+  totalMarks      Float?       @map("total_marks")
+  marksObtained   Float?       @map("marks_obtained")
+  percentage      Float?
+  correctCount    Int?         @map("correct_count")
+  incorrectCount  Int?         @map("incorrect_count")
+  unansweredCount Int?         @map("unanswered_count")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  exam            Exam             @relation(fields: [examId], references: [id])
+  user            User             @relation(fields: [userId], references: [id])
+  answers         Answer[]
+  integrityEvents IntegrityEvent[]
+  examSession     ExamSession?
+
+  @@index([examId])
+  @@index([userId])
+  @@index([state])
+  @@map("attempts")
+}
+
+model Answer {
+  id               String   @id @default(uuid())
+  attemptId        String   @map("attempt_id")
+  questionId       String   @map("question_id")
+  examQuestionId   String   @map("exam_question_id")
+  selectedOptions  Json?    @map("selected_options") // Array of selected option indices
+  numericalAnswer  Float?   @map("numerical_answer")
+  isMarkedForReview Boolean @default(false) @map("is_marked_for_review")
+  isVisited        Boolean  @default(false) @map("is_visited")
+  timeSpentSeconds Int      @default(0) @map("time_spent_seconds")
+  savedAt          DateTime @default(now()) @map("saved_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  attempt      Attempt      @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question     Question     @relation(fields: [questionId], references: [id])
+  examQuestion ExamQuestion @relation(fields: [examQuestionId], references: [id])
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@map("answers")
+}
+
+model ExamSession {
+  id              String          @id @default(uuid())
+  attemptId       String          @unique @map("attempt_id")
+  userId          String          @map("user_id")
+  ipAddress       String?         @map("ip_address")
+  userAgent       String?         @map("user_agent")
+  examEnvironment ExamEnvironment @default(STANDARD_BROWSER) @map("exam_environment")
+  isActive        Boolean         @default(true) @map("is_active")
+  connectedAt     DateTime        @default(now()) @map("connected_at")
+  disconnectedAt  DateTime?       @map("disconnected_at")
+
+  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+  hardwareProfiles HardwareProfile[]
+
+  @@index([userId])
+  @@map("exam_sessions")
+}
+
+model IntegrityEvent {
+  id        String             @id @default(uuid())
+  attemptId String             @map("attempt_id")
+  userId    String             @map("user_id")
+  eventType IntegrityEventType @map("event_type")
+  details   Json?              // Additional event-specific data
+  ipAddress String?            @map("ip_address")
+  timestamp DateTime           @default(now())
+
+  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([attemptId])
+  @@index([userId])
+  @@index([eventType])
+  @@index([timestamp])
+  @@map("integrity_events")
+}
+
+model HardwareProfile {
+  id               String       @id @default(uuid())
+  userId           String       @map("user_id")
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId        String?      @map("session_id")
+  session          ExamSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  isVM             Boolean      @default(false) @map("is_vm")
+  gpuRenderer      String       @map("gpu_renderer")
+  gpuVendor        String       @map("gpu_vendor")
+  logicalCores     Int          @map("logical_cores")
+  deviceMemoryGB   Float?       @map("device_memory_gb")
+  screenResolution String       @map("screen_resolution")
+  isMultiMonitor   Boolean      @default(false) @map("is_multi_monitor")
+  monitorCount     Int          @default(1) @map("monitor_count")
+  userAgent        String       @map("user_agent")
+  detectedFlags    Json         @default("[]") @map("detected_flags")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([isVM])
+  @@map("hardware_profiles")
+}
