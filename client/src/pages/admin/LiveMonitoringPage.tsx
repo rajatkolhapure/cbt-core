@@ -406,7 +406,7 @@ export const LiveMonitoringPage: React.FC = () => {
           {mode === 'personal' && (
             <button
               onClick={handleBackToOverview}
-              className="p-1.5 bg-[#F4EFEA] hover:bg-white text-[#1C1D21] border border-[#1C1D21] btn-tactile transition cursor-pointer"
+              className="p-1.5 bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] border border-[#1C1D21] btn-tactile transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>

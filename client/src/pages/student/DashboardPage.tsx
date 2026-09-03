@@ -218,7 +218,7 @@ export const StudentDashboardPage: React.FC = () => {
 
                     <button
                       onClick={() => handleViewResult(attempt.id)}
-                      className="px-4 py-2 font-mono text-xs font-bold uppercase bg-white hover:bg-[#F4EFEA] text-[#1C1D21] border border-[#1C1D21] btn-tactile flex items-center gap-1.5"
+                      className="px-4 py-2 font-mono text-xs font-bold uppercase bg-white hover:bg-[#EBF5F0] hover:text-[#236B47] text-[#1C1D21] border border-[#236B47] btn-tactile flex items-center gap-1.5"
                     >
                       <span>Scorecard &amp; Solutions</span>
                       <ArrowRight className="w-3.5 h-3.5 text-[#C88A2D]" />
