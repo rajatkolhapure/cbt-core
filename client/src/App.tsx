@@ -5,6 +5,7 @@ import ProtectedRoute from './components/layout/ProtectedRoute';
 import AdminLayout from './components/layout/AdminLayout';
 
 import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
 import DashboardPage from './pages/admin/DashboardPage';
 import QuestionBankPage from './pages/admin/QuestionBankPage';
 import ExamManagementPage from './pages/admin/ExamManagementPage';
@@ -47,8 +48,9 @@ export function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Authentication Route */}
+          {/* Public Authentication Routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           {/* Root redirect */}
           <Route path="/" element={<RootRedirect />} />

@@ -4,10 +4,45 @@ import { AUTH_CONFIG } from '../config/auth';
 import type { AuthRequest } from '../middleware/auth.middleware';
 
 export class AuthController {
-  async register(_req: AuthRequest, res: Response, _next: NextFunction) {
-    return res.status(403).json({
-      error: 'Public candidate registration is disabled. Please contact your institution administrator.',
-    });
+  async sendOtp(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await authService.sendOtp(req.body);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyOtp(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { user, token } = await authService.verifyOtp(req.body);
+
+      res.cookie(AUTH_CONFIG.cookieName, token, AUTH_CONFIG.cookieOptions);
+
+      res.json({
+        message: 'Account verified and created successfully',
+        user,
+        token,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async register(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { user, token } = await authService.register(req.body);
+
+      res.cookie(AUTH_CONFIG.cookieName, token, AUTH_CONFIG.cookieOptions);
+
+      res.status(201).json({
+        message: 'Registration successful',
+        user,
+        token,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
   async login(req: AuthRequest, res: Response, next: NextFunction) {
