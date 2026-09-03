@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
   register: (name: string, email: string, password: string, candidateId?: string) => Promise<User>;
+  verifyOtpAndLogin: (data: { email: string; code: string; name: string; password: string; candidateId?: string }) => Promise<User>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 }
@@ -71,6 +72,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(token);
     localStorage.setItem('cbt_user', JSON.stringify(user));
     localStorage.setItem('cbt_token', token);
+
+    await collectAndSendHardwareProfile().catch(() => {});
+
+    return user;
+  };
+
+  const verifyOtpAndLogin = async (data: { email: string; code: string; name: string; password: string; candidateId?: string }) => {
+    const res = await api.post('/auth/verify-otp', data);
+    const { user, token } = res.data;
+    setUser(user);
+    setToken(token);
+    localStorage.setItem('cbt_user', JSON.stringify(user));
+    localStorage.setItem('cbt_token', token);
+
+    await collectAndSendHardwareProfile().catch(() => {});
+
     return user;
   };
 
@@ -95,6 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         register,
+        verifyOtpAndLogin,
         logout,
         setUser,
       }}
@@ -104,10 +122,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
+
+export default AuthContext;
