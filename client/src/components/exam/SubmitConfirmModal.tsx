@@ -84,7 +84,7 @@ export const SubmitConfirmModal: React.FC<SubmitConfirmModalProps> = ({
               Examination Submission Confirmation
             </h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1">
+          <button onClick={onClose} className="text-slate-400 hover:text-[#C88A2D] p-1 transition-colors duration-150">
             <X className="w-5 h-5" />
           </button>
         </div>

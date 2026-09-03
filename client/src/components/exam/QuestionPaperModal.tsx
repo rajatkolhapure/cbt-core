@@ -33,7 +33,7 @@ export const QuestionPaperModal: React.FC<QuestionPaperModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded transition-colors duration-75 cursor-pointer"
+            className="text-slate-400 hover:text-[#C88A2D] p-1 rounded transition-colors duration-150 cursor-pointer"
             title="Close"
           >
             <X className="w-4 h-4" />
