@@ -16,6 +16,8 @@ import integrityRoutes from './routes/integrity.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), 'server/.env') });
 
 const app = express();
 
