@@ -355,12 +355,12 @@ export const RegisterPage: React.FC = () => {
 
               {/* 6-box input */}
               <div className="flex justify-center items-center gap-2 sm:gap-2.5 my-4">
-                {otpDigits.map((digit, idx) => (
                   <input
                     key={idx}
                     ref={(el) => { otpInputRefs.current[idx] = el; }}
                     type="text"
                     inputMode="numeric"
+                    aria-label={`OTP digit ${idx + 1}`}
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
