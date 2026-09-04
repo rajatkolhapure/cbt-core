@@ -47,7 +47,7 @@ export class AuthService {
     });
 
     // Generate 6-digit code
-    const otpCode = crypto.randomInt(100000, 999999).toString();
+    const otpCode = crypto.randomInt(100000, 1000000).toString();
     const codeHash = await bcrypt.hash(otpCode, 10);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
