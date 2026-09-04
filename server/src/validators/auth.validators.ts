@@ -19,7 +19,7 @@ export const sendOtpSchema = z.object({
 
 export const verifyOtpSchema = z.object({
   email: z.string().email('Invalid email address'),
-  code: z.string().min(6, 'Verification code must be 6 digits').max(6, 'Verification code must be 6 digits'),
+  code: z.string().regex(/^\d{6}$/, 'Verification code must be 6 digits'),
   name: z.string().min(1, 'Name is required').max(100),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   candidateId: z.string().optional(),
