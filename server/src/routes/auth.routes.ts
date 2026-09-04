@@ -2,16 +2,35 @@ import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
 import { requireAuth } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validation.middleware';
-import { loginSchema, registerSchema } from '../validators/auth.validators';
+import {
+  loginSchema,
+  registerSchema,
+  sendOtpSchema,
+  verifyOtpSchema,
+} from '../validators/auth.validators';
 
 const router = Router();
 
-// POST /api/auth/register (Disabled)
-router.post('/register', (_req, res) => {
-  res.status(403).json({
-    error: 'Public candidate registration is disabled. Please contact the administrator (Rajat Kolhapure).',
-  });
-});
+// POST /api/auth/send-otp
+router.post(
+  '/send-otp',
+  validate(sendOtpSchema),
+  (req, res, next) => authController.sendOtp(req, res, next)
+);
+
+// POST /api/auth/verify-otp (completes registration with OTP verification & auto-assigns exam)
+router.post(
+  '/verify-otp',
+  validate(verifyOtpSchema),
+  (req, res, next) => authController.verifyOtp(req, res, next)
+);
+
+// POST /api/auth/register (direct registration fallback)
+router.post(
+  '/register',
+  validate(registerSchema),
+  (req, res, next) => authController.register(req, res, next)
+);
 
 // POST /api/auth/login
 router.post(

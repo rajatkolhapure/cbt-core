@@ -21,6 +21,8 @@ async function main() {
 
   // ─── 1. CLEAN EXISTING DATA ─────────────────────────────────────────
   console.log('🧹 Cleaning existing data...');
+  await prisma.otpToken.deleteMany();
+  await prisma.hardwareProfile.deleteMany();
   await prisma.integrityEvent.deleteMany();
   await prisma.examSession.deleteMany();
   await prisma.answer.deleteMany();
@@ -44,12 +46,12 @@ async function main() {
     data: {
       email: 'admin@cbt.com',
       password: passwordHash,
-      name: 'Dr. Rajesh Kumar',
+      name: 'Rajat Kolhapure',
       role: Role.ADMIN,
       candidateId: 'ADM-001',
     },
   });
-  console.log(`  ✓ Admin: ${admin.email}`);
+  console.log(`  ✓ Admin: ${admin.name} (${admin.email})`);
 
   const student1 = await prisma.user.create({
     data: {
@@ -63,9 +65,9 @@ async function main() {
 
   const student2 = await prisma.user.create({
     data: {
-      email: 'rahul@cbt.com',
+      email: 'parth@cbt.com',
       password: studentHash,
-      name: 'Rahul Patel',
+      name: 'Parth Jagdale',
       role: Role.STUDENT,
       candidateId: 'CET-2026-0002',
     },
@@ -73,14 +75,14 @@ async function main() {
 
   const student3 = await prisma.user.create({
     data: {
-      email: 'ananya@cbt.com',
+      email: 'rahul@cbt.com',
       password: studentHash,
-      name: 'Ananya Iyer',
+      name: 'Rahul Mehta',
       role: Role.STUDENT,
       candidateId: 'CET-2026-0003',
     },
   });
-  console.log(`  ✓ Students: ${student1.email}, ${student2.email}, ${student3.email}\n`);
+  console.log(`  ✓ Students: ${student1.name} (${student1.email}), ${student2.name} (${student2.email}), ${student3.name} (${student3.email})\n`);
 
   // ─── 3. CREATE SUBJECTS & CHAPTERS ──────────────────────────────────
   console.log('📚 Creating subjects and chapters...');
@@ -1078,14 +1080,13 @@ async function main() {
   console.log(`     Assignments: 6 (3 students × 2 exams)`);
   console.log('');
   console.log('  🔐 Login Credentials:');
-  console.log('     Admin:    admin@cbt.com / admin123');
-  console.log('     Student1: student@cbt.com / student123');
-  console.log('     Student2: rahul@cbt.com / student123');
-  console.log('     Student3: ananya@cbt.com / student123');
+  console.log('     Admin:    admin@cbt.com / admin123 (Rajat Kolhapure)');
+  console.log('     Student1: student@cbt.com / student123 (Priya Sharma, CET-2026-0001)');
+  console.log('     Student2: parth@cbt.com / student123 (Parth Jagdale, CET-2026-0002)');
+  console.log('     Student3: rahul@cbt.com / student123 (Rahul Mehta, CET-2026-0003)');
   console.log('');
   console.log('  🌐 Access:');
-  console.log('     Frontend: http://localhost:5173');
-  console.log('     Backend:  http://localhost:3000');
+  console.log('     Unified Portal: http://localhost:8080');
   console.log('═══════════════════════════════════════════════════════\n');
 }
 
