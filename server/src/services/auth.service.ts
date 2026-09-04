@@ -160,14 +160,14 @@ export class AuthService {
     // Find default active published exam (e.g., "MHT-CET Practice Mock 01" or first published exam)
     const defaultExam =
       (await prisma.exam.findFirst({
-        where: { title: { contains: 'MHT-CET', mode: 'insensitive' } },
+        where: {
+          isPublished: true,
+          title: { contains: 'MHT-CET', mode: 'insensitive' },
+        },
         orderBy: { createdAt: 'asc' },
       })) ||
       (await prisma.exam.findFirst({
         where: { isPublished: true },
-        orderBy: { createdAt: 'asc' },
-      })) ||
-      (await prisma.exam.findFirst({
         orderBy: { createdAt: 'asc' },
       }));
 
