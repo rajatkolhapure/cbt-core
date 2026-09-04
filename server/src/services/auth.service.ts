@@ -89,7 +89,7 @@ export class AuthService {
         console.error('[Resend Error]', emailErr);
         throw new AppError(500, `Failed to deliver verification email: ${emailErr.message || 'Please check your email address.'}`);
       }
-    } else {
+    } else if (process.env.NODE_ENV !== 'production') {
       console.warn(`\n========================================\n[OTP NOTIFICATION]\nEmail: ${email}\nOTP Code: ${otpCode}\n(Configure RESEND_API_KEY in server/.env to dispatch live emails)\n========================================\n`);
     }
 
