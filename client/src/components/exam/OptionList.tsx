@@ -35,17 +35,17 @@ export const OptionList: React.FC<OptionListProps> = ({
             <div
               key={idx}
               onClick={() => onSelectOption(idx)}
-              className={`group w-full max-w-full p-3 sm:p-3.5 border transition-all duration-75 cursor-pointer flex items-start gap-3 min-h-[48px] btn-tactile ${
+              className={`group w-full max-w-full p-3 sm:p-3.5 border cursor-pointer flex items-start gap-3 min-h-[48px] btn-tactile ${
                 isSelected
-                  ? 'border-[#1A2B4C] bg-[#F4EFEA] text-[#1C1D21] shadow-tactile'
-                  : 'border-[#1C1D21]/30 bg-white hover:border-[#1C1D21] hover:bg-[#FBF9F5] text-[#1C1D21]'
+                  ? 'border-[#1A2B4C] bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] shadow-tactile'
+                  : 'border-[#1C1D21]/30 bg-white hover:border-[#1C1D21] hover:bg-[#F4EFEA] text-[#1C1D21]'
               }`}
             >
               {/* Radio or Checkbox */}
               <div className="shrink-0 mt-0.5">
                 {type === 'SINGLE_CHOICE' ? (
                   <div
-                    className={`w-4.5 h-4.5 border-2 flex items-center justify-center transition-colors duration-75 ${
+                    className={`w-4.5 h-4.5 border-2 flex items-center justify-center transition-colors duration-160 ${
                       isSelected
                         ? 'border-[#1A2B4C] bg-[#1A2B4C]'
                         : 'border-[#1C1D21]/60 bg-white group-hover:border-[#1C1D21]'
@@ -55,7 +55,7 @@ export const OptionList: React.FC<OptionListProps> = ({
                   </div>
                 ) : (
                   <div
-                    className={`w-4.5 h-4.5 border-2 flex items-center justify-center transition-colors duration-75 ${
+                    className={`w-4.5 h-4.5 border-2 flex items-center justify-center transition-colors duration-160 ${
                       isSelected
                         ? 'border-[#1A2B4C] bg-[#1A2B4C] text-[#C88A2D]'
                         : 'border-[#1C1D21]/60 bg-white group-hover:border-[#1C1D21]'
@@ -72,10 +72,10 @@ export const OptionList: React.FC<OptionListProps> = ({
 
               {/* Option Letter Label */}
               <span
-                className={`font-mono font-bold text-xs px-2 py-0.5 border shrink-0 transition-colors duration-75 ${
+                className={`font-mono font-bold text-xs px-2 py-0.5 border shrink-0 transition-colors duration-160 ${
                   isSelected
                     ? 'bg-[#1A2B4C] text-[#C88A2D] border-[#1A2B4C]'
-                    : 'bg-[#F4EFEA] text-[#1C1D21] border-[#1C1D21]/30 group-hover:bg-[#EAE3D9]'
+                    : 'bg-[#F4EFEA] text-[#1C1D21] border-[#1C1D21]/30 group-hover:bg-[#EAE3D9] group-hover:border-[#1C1D21]/50'
                 }`}
               >
                 {label}

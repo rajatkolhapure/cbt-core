@@ -61,13 +61,13 @@
 .btn-tactile {
   border: 1px solid #1C1D21;
   box-shadow: 2px 2px 0px 0px #1C1D21;
-  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 90ms cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 160ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   user-select: none;
-}
-
-.btn-tactile:hover:not(:disabled) {
-  box-shadow: 2px 2px 0px 0px rgba(28, 29, 33, 0.72);
 }
 
 .btn-tactile:focus-visible {
@@ -77,7 +77,7 @@
 
 .btn-tactile:active:not(:disabled) {
   transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px 0px rgba(28, 29, 33, 0.72);
+  box-shadow: 1px 1px 0px 0px #1C1D21;
 }
 
 .btn-tactile:disabled {

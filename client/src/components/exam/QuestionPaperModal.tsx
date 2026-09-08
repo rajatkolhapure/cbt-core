@@ -67,7 +67,7 @@ export const QuestionPaperModal: React.FC<QuestionPaperModalProps> = ({
                     return (
                       <div
                         key={q.id || qIdx}
-                        className="p-4 rounded border border-slate-200 bg-white hover:border-slate-400 transition-colors duration-75 space-y-2.5"
+                        className="p-4 rounded border border-slate-200 bg-white hover:border-[#1C1D21] transition-colors duration-160 space-y-2.5"
                       >
                         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                           <div className="flex items-center gap-2">
@@ -94,7 +94,7 @@ export const QuestionPaperModal: React.FC<QuestionPaperModalProps> = ({
                                 onSelectQuestion(secIdx, qIdx);
                                 onClose();
                               }}
-                              className="text-xs font-bold text-blue-700 hover:text-blue-900 underline cursor-pointer"
+                              className="text-xs font-mono font-bold text-[#1A2B4C] hover:text-[#C88A2D] underline cursor-pointer transition-colors duration-160"
                             >
                               Jump to Question
                             </button>
@@ -137,7 +137,7 @@ export const QuestionPaperModal: React.FC<QuestionPaperModalProps> = ({
         <div className="px-5 py-3 bg-slate-100 border-t border-slate-200 flex justify-end shrink-0">
           <button
             onClick={onClose}
-            className="px-5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded transition-colors duration-75 cursor-pointer"
+            className="px-5 py-2 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] text-xs font-mono font-bold uppercase border border-[#1C1D21] btn-tactile shadow-tactile cursor-pointer"
           >
             Close Question Paper
           </button>

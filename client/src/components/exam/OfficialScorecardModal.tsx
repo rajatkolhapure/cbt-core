@@ -65,7 +65,7 @@ export const OfficialScorecardModal: React.FC<OfficialScorecardModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-none border border-slate-600 transition-colors duration-75 shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1A2B4C] hover:bg-[#121F38] text-white text-xs font-mono font-bold uppercase border border-[#1C1D21] btn-tactile cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print / Save as PDF</span>
@@ -158,7 +158,7 @@ export const OfficialScorecardModal: React.FC<OfficialScorecardModalProps> = ({
                   );
 
                   return (
-                    <tr key={idx} className="hover:bg-slate-100/60 transition-colors duration-75">
+                    <tr key={idx} className="hover:bg-slate-100/60 transition-colors duration-160">
                       <td className="py-2 px-3 border-r border-slate-300 font-sans font-bold text-slate-900 uppercase">
                         {sec.sectionName}
                       </td>
@@ -250,14 +250,14 @@ export const OfficialScorecardModal: React.FC<OfficialScorecardModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-black hover:bg-slate-800 text-white font-bold text-xs rounded-none transition-colors duration-75 shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1A2B4C] hover:bg-[#121F38] text-white font-mono font-bold text-xs uppercase border border-[#1C1D21] btn-tactile shadow-tactile cursor-pointer"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3.5 h-3.5 text-[#C88A2D]" />
               <span>Print Official PDF</span>
             </button>
             <button
               onClick={onClose}
-              className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-none transition-colors duration-75 cursor-pointer"
+              className="px-4 py-2 bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] font-mono font-bold text-xs uppercase border border-[#1C1D21] btn-tactile cursor-pointer"
             >
               Close
             </button>

@@ -87,17 +87,17 @@ export const ExamResultPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsScorecardModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded transition-colors duration-75 shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1A2B4C] hover:bg-[#121F38] text-white font-mono font-bold text-xs uppercase border border-[#1C1D21] btn-tactile shadow-tactile cursor-pointer"
           >
-            <Printer className="w-3.5 h-3.5" />
+            <Printer className="w-3.5 h-3.5 text-[#C88A2D]" />
             <span>Official Score Card (PDF)</span>
           </button>
           <button
             onClick={() => setActiveTab('scorecard')}
-            className={`px-3 py-1.5 rounded text-xs font-semibold transition ${
+            className={`px-3 py-1.5 font-mono text-xs font-bold uppercase border btn-tactile cursor-pointer ${
               activeTab === 'scorecard'
-                ? 'bg-slate-900 text-white'
-                : 'bg-white border border-gray-300 text-slate-700 hover:bg-slate-50'
+                ? 'bg-[#1A2B4C] hover:bg-[#121F38] text-white border-[#1C1D21]'
+                : 'bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] border-[#1C1D21]/40'
             }`}
           >
             Detailed Analytics
@@ -105,10 +105,10 @@ export const ExamResultPage: React.FC = () => {
           {reviewData && (
             <button
               onClick={() => setActiveTab('review')}
-              className={`px-3 py-1.5 rounded text-xs font-semibold transition ${
+              className={`px-3 py-1.5 font-mono text-xs font-bold uppercase border btn-tactile cursor-pointer ${
                 activeTab === 'review'
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-white border border-gray-300 text-slate-700 hover:bg-slate-50'
+                  ? 'bg-[#1A2B4C] hover:bg-[#121F38] text-white border-[#1C1D21]'
+                  : 'bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] border-[#1C1D21]/40'
               }`}
             >
               Paper Solutions & Explanations
@@ -264,13 +264,13 @@ export const ExamResultPage: React.FC = () => {
                 const unattemptedCount = allQs.filter((q: any) => !q.isAttempted).length;
 
                 return (
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:pt-0">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:pt-0 font-mono">
                     <button
                       onClick={() => setSolutionFilter('ALL')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors duration-75 cursor-pointer ${
+                      className={`px-3 py-1.5 text-xs font-bold uppercase border btn-tactile cursor-pointer ${
                         solutionFilter === 'ALL'
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          ? 'bg-[#1A2B4C] hover:bg-[#121F38] text-white border-[#1C1D21]'
+                          : 'bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] border-[#1C1D21]/40'
                       }`}
                     >
                       All ({totalCount})
@@ -278,10 +278,10 @@ export const ExamResultPage: React.FC = () => {
 
                     <button
                       onClick={() => setSolutionFilter('INCORRECT')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors duration-75 cursor-pointer flex items-center gap-1.5 ${
+                      className={`px-3 py-1.5 text-xs font-bold uppercase border btn-tactile cursor-pointer flex items-center gap-1.5 ${
                         solutionFilter === 'INCORRECT'
-                          ? 'bg-rose-600 text-white shadow-xs'
-                          : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                          ? 'bg-[#A83232] hover:bg-[#8F2929] text-white border-[#1C1D21]'
+                          : 'bg-[#FDF0F0] hover:bg-[#FBE4E4] text-[#A83232] hover:text-[#8F2929] border border-[#A83232]'
                       }`}
                     >
                       <XCircle className="w-3.5 h-3.5" />
@@ -290,10 +290,10 @@ export const ExamResultPage: React.FC = () => {
 
                     <button
                       onClick={() => setSolutionFilter('CORRECT')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors duration-75 cursor-pointer flex items-center gap-1.5 ${
+                      className={`px-3 py-1.5 text-xs font-bold uppercase border btn-tactile cursor-pointer flex items-center gap-1.5 ${
                         solutionFilter === 'CORRECT'
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                          ? 'bg-[#236B47] hover:bg-[#1C5638] text-white border-[#1C1D21]'
+                          : 'bg-[#EBF5F0] hover:bg-[#DEEFE6] text-[#236B47] hover:text-[#1C5638] border border-[#236B47]'
                       }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
@@ -302,10 +302,10 @@ export const ExamResultPage: React.FC = () => {
 
                     <button
                       onClick={() => setSolutionFilter('UNATTEMPTED')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors duration-75 cursor-pointer flex items-center gap-1.5 ${
+                      className={`px-3 py-1.5 text-xs font-bold uppercase border btn-tactile cursor-pointer flex items-center gap-1.5 ${
                         solutionFilter === 'UNATTEMPTED'
-                          ? 'bg-slate-700 text-white shadow-xs'
-                          : 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200'
+                          ? 'bg-[#575A65] hover:bg-[#434650] text-white border-[#1C1D21]'
+                          : 'bg-[#FBF9F5] hover:bg-[#EAE3D9] text-[#575A65] hover:text-[#1C1D21] border border-[#1C1D21]/40'
                       }`}
                     >
                       <HelpCircle className="w-3.5 h-3.5" />

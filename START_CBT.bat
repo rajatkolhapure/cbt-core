@@ -5,7 +5,7 @@ echo   Starting CBT Platform + Cloudflare Tunnel
 echo ===================================================
 echo.
 start "CBT Server" /min cmd /c "npm run serve"
-timeout /t 3 /nobreak >nul
+ping 127.0.0.1 -n 4 >nul
 start "Cloudflare Tunnel (cbt)" /min cmd /c "cloudflared.exe --config config.yml tunnel run"
 echo.
 echo Server: http://localhost:8080

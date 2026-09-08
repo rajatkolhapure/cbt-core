@@ -32,10 +32,10 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
               }
             }}
             disabled={!allowSectionJump && !isActive}
-            className={`px-3.5 sm:px-4 py-2 text-xs font-mono font-bold uppercase transition-all duration-75 flex items-center gap-2 border-t border-l border-r border-[#1C1D21] -mb-px shrink-0 cursor-pointer ${
+            className={`px-3.5 sm:px-4 py-2 text-xs font-mono font-bold uppercase transition-colors duration-160 ease-out flex items-center gap-2 border-t border-l border-r border-[#1C1D21] -mb-px shrink-0 cursor-pointer ${
               isActive
                 ? 'bg-white text-[#1C1D21] border-b-white shadow-xs font-bold'
-                : 'bg-[#EAE3D9] text-[#575A65] hover:text-[#1C1D21] hover:bg-[#FBF9F5] border-b-[#1C1D21]'
+                : 'bg-[#EAE3D9] text-[#575A65] hover:text-[#1C1D21] hover:bg-[#F4EFEA] border-b-[#1C1D21]'
             } disabled:opacity-40 disabled:cursor-not-allowed`}
           >
             <span>{section.name}</span>

@@ -85,7 +85,7 @@ export const AdminLayout: React.FC = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center justify-between px-3 py-2.5 text-xs font-mono uppercase tracking-wider transition-all duration-75 ${
+                  className={`flex items-center justify-between px-3 py-2.5 text-xs font-mono uppercase tracking-wider transition-colors duration-160 ease-out ${
                     isActive
                       ? 'bg-[#1A2B4C] text-[#FBF9F5] font-bold border border-[#1C1D21] shadow-xs'
                       : 'text-[#575A65] hover:bg-[#F4EFEA] hover:text-[#1C1D21]'

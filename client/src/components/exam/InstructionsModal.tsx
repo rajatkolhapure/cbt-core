@@ -117,7 +117,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({ isOpen, on
         <div className="px-5 py-3 bg-slate-100 border-t border-slate-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded transition-colors duration-75 cursor-pointer shadow-xs"
+            className="px-5 py-2 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] text-xs font-mono font-bold uppercase border border-[#1C1D21] btn-tactile shadow-tactile cursor-pointer"
           >
             I Understand / Return to Test
           </button>

@@ -27,7 +27,7 @@ export const ExamNavigation: React.FC<ExamNavigationProps> = ({
         <button
           type="button"
           onClick={onMarkForReviewAndNext}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FEF8ED] hover:bg-[#FBF3E4] text-[#C88A2D] font-mono text-xs font-bold uppercase border border-[#C88A2D] btn-tactile cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FEF8ED] hover:bg-[#FBF3E4] text-[#C88A2D] hover:text-[#B37923] border border-[#C88A2D] hover:border-[#B37923] btn-tactile cursor-pointer"
           title="Flag question for review and proceed"
         >
           <BookmarkCheck className="w-3.5 h-3.5 text-[#C88A2D]" />
@@ -38,7 +38,7 @@ export const ExamNavigation: React.FC<ExamNavigationProps> = ({
         <button
           type="button"
           onClick={onClearResponse}
-          className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 bg-[#FBF9F5] hover:bg-[#EAE3D9] text-[#575A65] hover:text-[#1C1D21] font-mono text-xs font-bold uppercase border border-[#1C1D21]/40 btn-tactile cursor-pointer"
+          className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 bg-[#FBF9F5] hover:bg-[#EAE3D9] text-[#575A65] hover:text-[#1C1D21] font-mono text-xs font-bold uppercase border border-[#1C1D21]/40 hover:border-[#1C1D21] btn-tactile cursor-pointer"
           title="Deselect chosen option"
         >
           <RotateCcw className="w-3 h-3 text-[#575A65]" />

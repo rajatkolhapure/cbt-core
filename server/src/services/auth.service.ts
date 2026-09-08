@@ -64,7 +64,7 @@ export class AuthService {
     if (resendClient) {
       try {
         await resendClient.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || 'CBT Verification <noreply@cbt.rajatkolhapure.me>',
+          from: process.env.RESEND_FROM_EMAIL || process.env.FROM_EMAIL || 'CBT Verification <noreply@cbt.rajatkolhapure.me>',
           to: email,
           subject: `${otpCode} is your CBT Examination Verification Code`,
           html: `
