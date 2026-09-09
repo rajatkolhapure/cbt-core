@@ -4,7 +4,7 @@
 
 ---
 
-##  Quick Start for Collaborators
+##  Quick Start
 
 Follow these steps to set up and run the platform locally on your machine.
 
@@ -16,7 +16,7 @@ Follow these steps to set up and run the platform locally on your machine.
 ### 2. Installation
 Clone the repository and install all dependencies (root, client, and server workspaces):
 ```bash
-git clone https://github.com/anish455/CBT.git
+git clone https://github.com/anish455/Computer-Based-Test.git
 cd CBT
 npm install
 ```
