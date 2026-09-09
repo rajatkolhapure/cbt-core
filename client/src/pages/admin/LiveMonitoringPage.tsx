@@ -406,7 +406,7 @@ export const LiveMonitoringPage: React.FC = () => {
           {mode === 'personal' && (
             <button
               onClick={handleBackToOverview}
-              className="p-1.5 bg-[#F4EFEA] hover:bg-white text-[#1C1D21] border border-[#1C1D21] btn-tactile transition cursor-pointer"
+              className="p-1.5 bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] border border-[#1C1D21] btn-tactile transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
@@ -513,10 +513,10 @@ export const LiveMonitoringPage: React.FC = () => {
                 <button
                   key={f}
                   onClick={() => setFilterStatus(f)}
-                  className={`px-3 py-1 text-[11px] uppercase font-bold border transition-all btn-tactile ${
+                  className={`px-3 py-1 text-[11px] uppercase font-bold border btn-tactile ${
                     filterStatus === f
-                      ? 'bg-[#1A2B4C] text-white border-[#1C1D21]'
-                      : 'bg-white text-[#575A65] border-[#1C1D21]/40 hover:bg-[#F4EFEA]'
+                      ? 'bg-[#1A2B4C] hover:bg-[#121F38] text-white border-[#1C1D21]'
+                      : 'bg-white text-[#575A65] hover:text-[#1C1D21] border-[#1C1D21]/40 hover:border-[#1C1D21] hover:bg-[#F4EFEA]'
                   }`}
                 >
                   {f === 'ALL' ? 'ALL CANDIDATES' : f}
@@ -903,7 +903,7 @@ export const LiveMonitoringPage: React.FC = () => {
                       <button
                         onClick={handleSendWarning}
                         disabled={!warningMessage.trim() || isActionLoading}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-[#C88A2D] text-[#1C1D21] font-mono text-xs font-bold uppercase border border-[#1C1D21] btn-tactile cursor-pointer disabled:opacity-40"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-[#C88A2D] hover:bg-[#B37923] text-[#1C1D21] font-mono text-xs font-bold uppercase border border-[#1C1D21] btn-tactile cursor-pointer disabled:opacity-40"
                       >
                         <Send className="w-3.5 h-3.5" /> Dispatch
                       </button>
@@ -914,7 +914,7 @@ export const LiveMonitoringPage: React.FC = () => {
                         <button
                           key={i}
                           onClick={() => setWarningMessage(preset)}
-                          className="text-[10px] px-2 py-1 bg-[#FEF8ED] text-[#C88A2D] border border-[#C88A2D] btn-tactile truncate max-w-[220px]"
+                          className="text-[10px] px-2 py-1 bg-[#FEF8ED] hover:bg-[#FBF3E4] text-[#C88A2D] hover:text-[#B37923] border border-[#C88A2D] btn-tactile truncate max-w-[220px]"
                           title={preset}
                         >
                           <MessageSquareWarning className="w-3 h-3 inline mr-1" />
@@ -942,7 +942,7 @@ export const LiveMonitoringPage: React.FC = () => {
                       <button
                         onClick={handleAddTime}
                         disabled={isActionLoading}
-                        className="px-2 py-0.5 bg-[#1A2B4C] text-white text-[10px] font-bold border border-[#1C1D21] btn-tactile cursor-pointer"
+                        className="px-2 py-0.5 bg-[#1A2B4C] hover:bg-[#121F38] text-white text-[10px] font-bold border border-[#1C1D21] btn-tactile cursor-pointer"
                       >
                         <Plus className="w-3 h-3 inline" /> Extend
                       </button>
@@ -954,7 +954,7 @@ export const LiveMonitoringPage: React.FC = () => {
                     {!showTerminateConfirm ? (
                       <button
                         onClick={() => setShowTerminateConfirm(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FDF0F0] text-[#A83232] border border-[#A83232] text-xs font-mono font-bold uppercase btn-tactile cursor-pointer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FDF0F0] hover:bg-[#FBE4E4] text-[#A83232] hover:text-[#8F2929] border border-[#A83232] hover:border-[#8F2929] text-xs font-mono font-bold uppercase btn-tactile cursor-pointer"
                       >
                         <Ban className="w-3.5 h-3.5" /> Terminate Session
                       </button>
@@ -965,13 +965,13 @@ export const LiveMonitoringPage: React.FC = () => {
                         <button
                           onClick={handleTerminate}
                           disabled={isActionLoading}
-                          className="px-2.5 py-1 bg-[#A83232] text-white text-[10px] font-bold border border-[#1C1D21] btn-tactile cursor-pointer"
+                          className="px-2.5 py-1 bg-[#A83232] hover:bg-[#8F2929] text-white text-[10px] font-bold border border-[#1C1D21] btn-tactile cursor-pointer"
                         >
                           CONFIRM
                         </button>
                         <button
                           onClick={() => setShowTerminateConfirm(false)}
-                          className="px-2.5 py-1 bg-[#F4EFEA] text-[#1C1D21] text-[10px] font-bold border border-[#1C1D21] btn-tactile cursor-pointer"
+                          className="px-2.5 py-1 bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] text-[10px] font-bold border border-[#1C1D21] btn-tactile cursor-pointer"
                         >
                           Cancel
                         </button>

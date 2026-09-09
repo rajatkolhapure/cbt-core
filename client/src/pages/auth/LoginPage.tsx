@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ShieldCheck, LogIn, AlertCircle, Terminal, Cpu } from 'lucide-react';
 
@@ -129,8 +129,19 @@ export const LoginPage: React.FC = () => {
             </div>
           </form>
 
+          {/* Student Registration Link */}
+          <div className="mt-5 text-center">
+            <Link
+              to="/register"
+              className="font-mono text-xs text-[#1A2B4C] hover:text-[#C88A2D] font-bold hover:underline inline-flex items-center gap-1 transition"
+            >
+              <span>New student? Verify &amp; Register here</span>
+              <span>→</span>
+            </Link>
+          </div>
+
           {/* Micro Footer */}
-          <div className="mt-6 pt-4 border-t border-[#DCD6CD] flex items-center justify-between text-[10px] font-mono text-[#575A65]">
+          <div className="mt-5 pt-4 border-t border-[#DCD6CD] flex items-center justify-between text-[10px] font-mono text-[#575A65]">
             <span>STATUS: READY</span>
             <span>RESTRICTED ACCESS</span>
           </div>

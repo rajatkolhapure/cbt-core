@@ -129,18 +129,18 @@ export const QuestionPalette: React.FC<QuestionPaletteProps> = ({
             const status = getStatus(q.question.id, idx);
             const isCurrent = idx === currentQuestionIndex;
 
-            let colorClasses = 'bg-white border-[#1C1D21]/40 text-[#1C1D21] hover:border-[#1C1D21]';
+            let colorClasses = 'bg-white border-[#1C1D21]/40 text-[#1C1D21] hover:border-[#1C1D21] hover:bg-[#F4EFEA]';
 
             if (status === 'ANSWERED') {
-              colorClasses = 'bg-[#236B47] border-[#1C1D21] text-white font-bold';
+              colorClasses = 'bg-[#236B47] hover:bg-[#1C5638] border-[#1C1D21] text-white font-bold';
             } else if (status === 'ANSWERED_AND_MARKED') {
-              colorClasses = 'bg-[#236B47] border-2 border-[#C88A2D] text-white font-bold';
+              colorClasses = 'bg-[#236B47] hover:bg-[#1C5638] border-2 border-[#C88A2D] hover:border-[#B37923] text-white font-bold';
             } else if (status === 'MARKED_FOR_REVIEW') {
-              colorClasses = 'bg-[#C88A2D] border-[#1C1D21] text-[#1C1D21] font-bold';
+              colorClasses = 'bg-[#C88A2D] hover:bg-[#B37923] border-[#1C1D21] text-[#1C1D21] font-bold';
             } else if (status === 'NOT_ANSWERED') {
-              colorClasses = 'bg-[#A83232] border-[#1C1D21] text-white font-bold';
+              colorClasses = 'bg-[#A83232] hover:bg-[#8F2929] border-[#1C1D21] text-white font-bold';
             } else if (status === 'NOT_VISITED') {
-              colorClasses = 'bg-[#FFFFFF] border border-[#1C1D21]/30 text-[#575A65] hover:bg-[#F4EFEA]';
+              colorClasses = 'bg-[#FFFFFF] border border-[#1C1D21]/30 text-[#575A65] hover:bg-[#F4EFEA] hover:text-[#1C1D21] hover:border-[#1C1D21]';
             }
 
             return (
@@ -148,7 +148,7 @@ export const QuestionPalette: React.FC<QuestionPaletteProps> = ({
                 key={q.id || idx}
                 type="button"
                 onClick={() => handleItemClick(idx)}
-                className={`h-9 border font-mono text-xs flex items-center justify-center transition-all duration-75 btn-tactile relative ${colorClasses} ${
+                className={`h-9 border font-mono text-xs flex items-center justify-center btn-tactile relative ${colorClasses} ${
                   isCurrent
                     ? 'ring-2 ring-[#1A2B4C] ring-offset-1 font-black shadow-tactile'
                     : ''

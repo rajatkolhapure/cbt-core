@@ -43,8 +43,8 @@ export const NumericalInput: React.FC<NumericalInputProps> = ({
   const keypadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '-'];
 
   return (
-    <div className="space-y-4 pt-2 max-w-sm">
-      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+    <div className="space-y-4 pt-2 max-w-sm font-sans">
+      <div className="text-[11px] font-mono font-bold text-[#575A65] uppercase tracking-wider">
         Enter Numerical Response:
       </div>
 
@@ -58,20 +58,20 @@ export const NumericalInput: React.FC<NumericalInputProps> = ({
             onChange(val === '' ? null : Number(val));
           }}
           placeholder="0.00"
-          className="w-full text-lg font-mono font-bold px-3 py-2 border-2 border-slate-400 rounded focus:outline-none focus:border-blue-600 bg-white"
+          className="w-full text-lg font-mono font-bold px-3.5 py-2 border border-[#1C1D21] focus:outline-none focus:bg-white focus:shadow-tactile bg-[#FBF9F5] text-[#1C1D21]"
         />
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="px-3 py-2 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded transition-colors duration-75 shrink-0 cursor-pointer"
+          className="px-3 py-2 font-mono text-xs font-bold uppercase bg-[#FBF9F5] hover:bg-[#EAE3D9] text-[#575A65] hover:text-[#1C1D21] border border-[#1C1D21]/40 btn-tactile shrink-0 cursor-pointer"
         >
           Clear
         </button>
       </div>
 
       {/* On-screen Keypad */}
-      <div className="bg-slate-100 p-3 rounded-lg border border-slate-300 space-y-2 select-none">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+      <div className="bg-[#F4EFEA] p-3 border border-[#1C1D21] space-y-2 select-none shadow-tactile">
+        <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#575A65]">
           On-Screen Keypad
         </div>
         <div className="grid grid-cols-3 gap-1.5">
@@ -80,7 +80,7 @@ export const NumericalInput: React.FC<NumericalInputProps> = ({
               key={key}
               type="button"
               onClick={() => handleKeyPress(key)}
-              className="py-2.5 bg-white hover:bg-slate-200 border border-slate-300 rounded font-mono font-bold text-sm text-slate-800 shadow-2xs active:bg-slate-300 transition-colors duration-75 cursor-pointer"
+              className="py-2.5 bg-white hover:bg-[#EAE3D9] border border-[#1C1D21] font-mono font-bold text-sm text-[#1C1D21] btn-tactile cursor-pointer"
             >
               {key}
             </button>
@@ -88,15 +88,15 @@ export const NumericalInput: React.FC<NumericalInputProps> = ({
           <button
             type="button"
             onClick={() => handleKeyPress('BACKSPACE')}
-            className="py-2.5 col-span-2 bg-slate-200 hover:bg-slate-300 border border-slate-300 rounded font-semibold text-xs text-slate-700 flex items-center justify-center gap-1 active:bg-slate-400 transition-colors duration-75 cursor-pointer"
+            className="py-2.5 col-span-2 bg-[#FBF9F5] hover:bg-[#EAE3D9] border border-[#1C1D21] font-mono font-bold text-xs text-[#1C1D21] flex items-center justify-center gap-1.5 btn-tactile cursor-pointer"
           >
-            <Delete className="w-4 h-4" />
+            <Delete className="w-3.5 h-3.5 text-[#575A65]" />
             <span>Backspace</span>
           </button>
           <button
             type="button"
             onClick={() => handleKeyPress('CLEAR')}
-            className="py-2.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 rounded font-semibold text-xs text-rose-800 active:bg-rose-300 transition-colors duration-75 cursor-pointer"
+            className="py-2.5 bg-[#FDF0F0] hover:bg-[#FBE4E4] border border-[#A83232] font-mono font-bold text-xs text-[#A83232] hover:text-[#8F2929] btn-tactile cursor-pointer"
           >
             Clear
           </button>

@@ -84,7 +84,7 @@ export const SubmitConfirmModal: React.FC<SubmitConfirmModalProps> = ({
               Examination Submission Confirmation
             </h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1">
+          <button onClick={onClose} className="text-slate-400 hover:text-[#C88A2D] p-1 transition-colors duration-150">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -166,7 +166,7 @@ export const SubmitConfirmModal: React.FC<SubmitConfirmModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 border border-gray-300 rounded font-semibold text-xs text-slate-700 hover:bg-slate-50 transition"
+              className="px-4 py-2 bg-[#F4EFEA] hover:bg-[#EAE3D9] text-[#1C1D21] border border-[#1C1D21] font-mono font-bold text-xs uppercase btn-tactile cursor-pointer disabled:opacity-40"
             >
               Resume Test
             </button>
@@ -174,7 +174,7 @@ export const SubmitConfirmModal: React.FC<SubmitConfirmModalProps> = ({
               type="button"
               onClick={onConfirmSubmit}
               disabled={isSubmitting}
-              className="px-6 py-2 bg-blue-900 hover:bg-blue-950 text-white font-bold text-xs rounded transition shadow-md flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] font-mono font-bold text-xs uppercase border border-[#1C1D21] btn-tactile shadow-tactile flex items-center gap-2 cursor-pointer disabled:opacity-40"
             >
               {isSubmitting ? (
                 <>

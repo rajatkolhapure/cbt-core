@@ -19,6 +19,7 @@ build/
 server/.env
 server/.env.local
 credentials.json
+b1a6e966-bbd5-43a2-957d-386c0913dc0c.json
 *.pem
 
 # Logs

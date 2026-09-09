@@ -68,10 +68,10 @@ export const IntegrityWarningModal: React.FC<IntegrityWarningModalProps> = ({
             <button
               type="button"
               onClick={onEnterFullscreen}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+              className="w-full py-3 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] font-mono font-bold text-xs uppercase border border-[#1C1D21] btn-tactile shadow-tactile flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Maximize2 className="w-4 h-4" />
-              <span>Enter Fullscreen & Begin Test</span>
+              <Maximize2 className="w-4 h-4 text-[#C88A2D]" />
+              <span>Enter Fullscreen &amp; Begin Test</span>
             </button>
           </div>
         </div>
@@ -139,11 +139,11 @@ export const IntegrityWarningModal: React.FC<IntegrityWarningModalProps> = ({
               <button
                 type="button"
                 onClick={onEnterFullscreen}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                className="w-full py-3 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] font-mono font-bold text-xs uppercase border border-[#1C1D21] btn-tactile shadow-tactile flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Maximize2 className="w-4 h-4" />
-                <span>Return to Fullscreen & Resume</span>
-                <ArrowRight className="w-4 h-4" />
+                <Maximize2 className="w-4 h-4 text-[#C88A2D]" />
+                <span>Return to Fullscreen &amp; Resume</span>
+                <ArrowRight className="w-4 h-4 text-[#C88A2D]" />
               </button>
             </div>
           )}

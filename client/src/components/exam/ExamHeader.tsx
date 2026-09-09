@@ -107,10 +107,10 @@ export const ExamHeader: React.FC<ExamHeaderProps> = ({
               key={sz}
               type="button"
               onClick={() => onChangeFontSize(sz)}
-              className={`px-2 py-0.5 font-mono text-[10px] uppercase font-bold transition-all cursor-pointer ${
+              className={`px-2 py-0.5 font-mono text-[10px] uppercase font-bold transition-colors duration-160 cursor-pointer ${
                 fontSize === sz
                   ? 'bg-[#C88A2D] text-[#1C1D21]'
-                  : 'text-[#8E929E] hover:text-[#FBF9F5]'
+                  : 'text-[#8E929E] hover:text-[#FBF9F5] hover:bg-[#1A2B4C]'
               }`}
             >
               {sz === 'small' ? 'A-' : sz === 'normal' ? 'A' : 'A+'}

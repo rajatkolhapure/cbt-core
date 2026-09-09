@@ -15,7 +15,18 @@ import attemptRoutes from './routes/attempt.routes';
 import integrityRoutes from './routes/integrity.routes';
 import { errorHandler } from './middleware/error.middleware';
 
-dotenv.config();
+const envCandidates = [
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(__dirname, '../.env'),
+  path.resolve(process.cwd(), 'server/.env'),
+];
+
+for (const envPath of envCandidates) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    break;
+  }
+}
 
 const app = express();
 

@@ -22,7 +22,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({ isOpen, on
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded transition-colors duration-75 cursor-pointer"
+            className="text-slate-400 hover:text-[#C88A2D] p-1 rounded transition-colors duration-150 cursor-pointer"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -117,7 +117,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({ isOpen, on
         <div className="px-5 py-3 bg-slate-100 border-t border-slate-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded transition-colors duration-75 cursor-pointer shadow-xs"
+            className="px-5 py-2 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] text-xs font-mono font-bold uppercase border border-[#1C1D21] btn-tactile shadow-tactile cursor-pointer"
           >
             I Understand / Return to Test
           </button>
