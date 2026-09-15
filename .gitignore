@@ -3,6 +3,9 @@ node_modules/
 /.pnp
 .pnp.js
 
+# Platform-specific lock files (generated on Windows, breaks Linux builds)
+client/package-lock.json
+
 # Build Outputs
 dist/
 client/dist/
