@@ -143,6 +143,19 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
+  // Dedicated paste handler — onChange can't see full paste because maxLength=1 truncates it
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+    if (!pasted) return;
+    const newDigits = [...otpDigits];
+    pasted.split('').forEach((char, i) => {
+      if (index + i < 6) newDigits[index + i] = char;
+    });
+    setOtpDigits(newDigits);
+    otpInputRefs.current[Math.min(index + pasted.length, 5)]?.focus();
+  };
+
   // Handle Step 2: Verify OTP and complete registration
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -366,6 +379,7 @@ export const RegisterPage: React.FC = () => {
                     value={digit}
                     onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    onPaste={(e) => handleOtpPaste(e, idx)}
                     className="w-10 sm:w-12 h-12 sm:h-14 text-center font-mono text-xl sm:text-2xl font-bold bg-[#FBF9F5] border-2 border-[#1C1D21] text-[#1C1D21] focus:bg-white focus:border-[#1A2B4C] focus:shadow-tactile focus:outline-none transition-all"
                   />
                 ))}
