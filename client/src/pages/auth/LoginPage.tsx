@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { ShieldCheck, LogIn, AlertCircle, Terminal, Cpu } from 'lucide-react';
+import { AlertCircle, Terminal, Cpu } from 'lucide-react';
+import { FoxCadetMascot } from '../../components/auth/FoxCadetMascot';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +10,9 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tickerStep, setTickerStep] = useState(0);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -36,6 +40,7 @@ export const LoginPage: React.FC = () => {
 
     try {
       const user = await login(email, password);
+      setIsSuccess(true);
       if (from) {
         navigate(from, { replace: true });
       } else if (user.role === 'ADMIN') {
@@ -44,6 +49,7 @@ export const LoginPage: React.FC = () => {
         navigate('/student/dashboard');
       }
     } catch (err: any) {
+      setIsSuccess(false);
       setError(
         err.response?.data?.error ||
         err.response?.data?.details?.[0]?.message ||
@@ -55,33 +61,98 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF9F5] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans selection:bg-[#1A2B4C] selection:text-[#FBF9F5]">
-      {/* Top Academic Masthead */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#1A2B4C] text-[#FBF9F5] border border-[#1C1D21] shadow-tactile mb-4">
-          <ShieldCheck className="w-6 h-6 text-[#C88A2D]" />
-        </div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1D21]">
-          Examination Portal
-        </h1>
-        <p className="mt-1 font-mono text-xs uppercase tracking-widest text-[#575A65]">
-          Computer-Based Testing & Proctoring Engine
-        </p>
-      </div>
+    <div
+      onMouseMove={(e) => setMousePosition({ x: e.clientX, y: e.clientY })}
+      className="min-h-screen bg-[#0B0F17] text-stone-100 flex flex-col lg:flex-row font-sans selection:bg-[#C85A32] selection:text-white relative overflow-x-hidden"
+    >
+      {/* Dynamic Font Import: Space Grotesk for Human Typographic Character */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap');
+        .font-space-grotesk {
+          font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+      `}</style>
 
-      {/* Main Terminal Card */}
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white border border-[#1C1D21] shadow-tactile-lg p-6 sm:p-8">
+      {/* Soft Ambient Radial Canvas Wash (warm charcoal/navy into graphite) */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#131B2A_0%,_#0D111A_45%,_#0B0F17_85%)] opacity-85 pointer-events-none" />
+
+      {/* ========================================================= */}
+      {/* LEFT 60% STAGE: Seamless Ambient Mascot Stage (Desktop)    */}
+      {/* ========================================================= */}
+      <section
+        aria-label="Cadet Mascot Stage"
+        className="hidden lg:flex lg:w-[58%] xl:w-[60%] relative flex-col items-center justify-center p-8 lg:p-12 overflow-hidden select-none"
+      >
+        {/* Ambient Cosmic Depth Rings */}
+        <div className="absolute w-[460px] h-[460px] rounded-full border border-stone-800/30 pointer-events-none -translate-y-4" />
+        <div className="absolute w-[620px] h-[620px] rounded-full border border-stone-800/15 pointer-events-none -translate-y-4" />
+
+        {/* Interactive Fox Cadet Vector Mascot */}
+        <div className="relative z-10 flex flex-col items-center max-w-sm w-full">
+          <FoxCadetMascot
+            isPasswordFocused={isPasswordFocused}
+            isError={Boolean(error)}
+            isSuccess={isSuccess}
+            mousePosition={mousePosition}
+            className="w-72 xl:w-84 h-auto"
+          />
+        </div>
+      </section>
+
+      {/* ========================================================= */}
+      {/* RIGHT 40% STAGE: Borderless "Launch Station" Login Form    */}
+      {/* ========================================================= */}
+      <section
+        aria-label="Launch Station Form"
+        className="w-full lg:w-[42%] xl:w-[40%] min-h-screen flex flex-col justify-center items-center px-6 py-12 sm:px-10 lg:px-14 z-10"
+      >
+        {/* Mobile Mascot Badge (< 1024px) */}
+        <div className="lg:hidden flex flex-col items-center justify-center mb-6">
+          <div className="w-20 h-20 rounded-full bg-[#121826] border border-stone-700/60 shadow-xl p-1.5 flex items-center justify-center overflow-hidden mb-2">
+            <FoxCadetMascot
+              isPasswordFocused={isPasswordFocused}
+              isError={Boolean(error)}
+              isSuccess={isSuccess}
+              mousePosition={mousePosition}
+              className="w-16 h-16"
+            />
+          </div>
+        </div>
+
+        {/* Borderless Floating Form Container with Editorial Accents */}
+        <div className="relative w-full max-w-md space-y-7">
+          
+          {/* Subtle Corner Tick Marks (Mechanical Instrument Aesthetic) */}
+          <span className="hidden sm:block absolute -top-4 -left-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+          <span className="hidden sm:block absolute -top-4 -right-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+          <span className="hidden sm:block absolute -bottom-4 -left-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+          <span className="hidden sm:block absolute -bottom-4 -right-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+
+          {/* Centered Editorial Header Hierarchy */}
+          <div className="flex flex-col items-center text-center mx-auto space-y-2">
+            <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-[#D4A373] uppercase select-none">
+              // CADET ACCESS GATE
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#F3F4F6] font-space-grotesk">
+              Launch Station
+            </h1>
+            <p className="text-sm text-stone-400 font-normal tracking-wide max-w-xs">
+              Sign in to continue your training streak.
+            </p>
+          </div>
+
+          {/* Error Feedback Banner */}
           {error && (
-            <div className="mb-5 bg-[#FDF0F0] border border-[#A83232] text-[#A83232] px-4 py-3 text-xs flex items-start gap-2.5 shadow-xs">
-              <AlertCircle className="w-4 h-4 text-[#A83232] shrink-0 mt-0.5" />
+            <div className="bg-[#261316] text-[#FCA5A5] px-4 py-3 text-xs rounded-lg flex items-start gap-2.5 border border-red-950">
+              <AlertCircle className="w-4 h-4 text-[#F87171] shrink-0 mt-0.5" />
               <span className="font-medium leading-relaxed">{error}</span>
             </div>
           )}
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Tactile Form Fields */}
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
-              <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1">
+              <label className="block text-xs font-mono uppercase tracking-wider text-stone-300 mb-2">
                 Candidate / Admin Email
               </label>
               <input
@@ -90,12 +161,12 @@ export const LoginPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="candidate@cbt.com"
-                className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
+                className="w-full px-4 py-3 bg-[#121826] border-none rounded-lg text-sm text-[#F3F4F6] placeholder:text-stone-500 focus:ring-1 focus:ring-[#D4A373]/70 focus:outline-none transition-all"
               />
             </div>
 
             <div>
-              <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1">
+              <label className="block text-xs font-mono uppercase tracking-wider text-stone-300 mb-2">
                 Access Key / Password
               </label>
               <input
@@ -103,50 +174,43 @@ export const LoginPage: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
                 placeholder="••••••••"
-                className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
+                className="w-full px-4 py-3 bg-[#121826] border-none rounded-lg text-sm text-[#F3F4F6] placeholder:text-stone-500 focus:ring-1 focus:ring-[#D4A373]/70 focus:outline-none transition-all"
               />
             </div>
 
-            <div className="pt-2">
+            <div className="pt-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 px-4 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] font-mono text-xs uppercase tracking-wider font-bold btn-tactile flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-5 bg-[#C85A32] hover:bg-[#B64B22] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-3.5 h-3.5 border-2 border-[#FBF9F5] border-t-transparent animate-spin" />
-                    <span>Verifying Environment...</span>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Launching Environment...</span>
                   </div>
                 ) : (
-                  <>
-                    <LogIn className="w-4 h-4 text-[#C88A2D]" />
-                    <span>Authenticate & Access Console</span>
-                  </>
+                  <span>[ Enter Arena ➔ ]</span>
                 )}
               </button>
             </div>
           </form>
 
-          {/* Student Registration Link */}
-          <div className="mt-5 text-center">
+          {/* Centered Registration Link */}
+          <div className="pt-1 text-center">
             <Link
               to="/register"
-              className="font-mono text-xs text-[#1A2B4C] hover:text-[#C88A2D] font-bold hover:underline inline-flex items-center gap-1 transition"
+              className="text-xs text-stone-400 hover:text-[#D4A373] font-medium transition-colors inline-flex items-center gap-1.5"
             >
-              <span>New student? Verify &amp; Register here</span>
+              <span>New cadet? Register here</span>
               <span>→</span>
             </Link>
           </div>
-
-          {/* Micro Footer */}
-          <div className="mt-5 pt-4 border-t border-[#DCD6CD] flex items-center justify-between text-[10px] font-mono text-[#575A65]">
-            <span>STATUS: READY</span>
-            <span>RESTRICTED ACCESS</span>
-          </div>
         </div>
-      </div>
+      </section>
 
       {/* Retro Telemetry Loading Screen Overlay */}
       {isSubmitting && (
