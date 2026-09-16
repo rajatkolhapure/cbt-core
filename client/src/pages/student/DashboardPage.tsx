@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   ArrowRight,
   ShieldCheck,
+  Flame,
+  Sparkles,
 } from 'lucide-react';
 
 export const StudentDashboardPage: React.FC = () => {
@@ -93,6 +95,34 @@ export const StudentDashboardPage: React.FC = () => {
             COMPLETED ({completedExams.length})
           </button>
         </div>
+      </div>
+
+      {/* Gamified AI Infinite Practice Arena Launch Banner */}
+      <div className="bg-gradient-to-r from-[#121826] via-[#1B263B] to-[#121826] text-white p-5 border-2 border-[#C88A2D] shadow-tactile-gold flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start gap-3.5">
+          <div className="w-12 h-12 rounded bg-[#C88A2D]/20 border border-[#C88A2D] flex items-center justify-center shrink-0">
+            <Flame className="w-6 h-6 text-[#C88A2D] animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 font-mono text-[10px] text-[#C88A2D] uppercase font-bold tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>ON-DEMAND AI QUESTION ENGINE</span>
+            </div>
+            <h2 className="font-serif text-lg sm:text-xl font-bold text-white mt-0.5">
+              Infinite Practice Arena · Gemini Flash-Lite
+            </h2>
+            <p className="text-xs text-stone-300 font-sans mt-1 max-w-xl">
+              Select any CET/JEE chapter or subtopic. Train in <strong>Arcade Mode</strong> with instant KaTeX derivations and combo multipliers, or simulate real timed test conditions.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => navigate('/student/practice/new')}
+          className="px-6 py-3 bg-[#C88A2D] hover:bg-[#B37822] text-[#1C1D21] font-mono text-xs uppercase font-bold tracking-wider btn-tactile shrink-0 flex items-center justify-center gap-2 cursor-pointer shadow-tactile"
+        >
+          <span>Enter Arena ➔</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

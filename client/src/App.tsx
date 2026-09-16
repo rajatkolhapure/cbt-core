@@ -17,6 +17,8 @@ import LiveMonitoringPage from './pages/admin/LiveMonitoringPage';
 import StudentLayout from './components/layout/StudentLayout';
 import StudentDashboardPage from './pages/student/DashboardPage';
 import ExamResultPage from './pages/student/ExamResultPage';
+import PracticeWizardPage from './pages/practice/PracticeWizardPage';
+import PracticeArenaPage from './pages/practice/PracticeArenaPage';
 
 import ExamPage from './pages/exam/ExamPage';
 
@@ -73,6 +75,8 @@ export function App() {
             <Route path="/student" element={<StudentLayout />}>
               <Route path="dashboard" element={<StudentDashboardPage />} />
               <Route path="results/:attemptId" element={<ExamResultPage />} />
+              <Route path="practice/new" element={<PracticeWizardPage />} />
+              <Route path="practice/:sessionId" element={<PracticeArenaPage />} />
             </Route>
             {/* Locked-down CBT Exam Interface without standard layout chrome */}
             <Route path="/exam/:examId" element={<ExamPage />} />

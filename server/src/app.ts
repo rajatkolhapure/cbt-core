@@ -13,6 +13,7 @@ import examRoutes from './routes/exam.routes';
 import adminRoutes from './routes/admin.routes';
 import attemptRoutes from './routes/attempt.routes';
 import integrityRoutes from './routes/integrity.routes';
+import aiPracticeRoutes from './routes/ai-practice.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const envCandidates = [
@@ -87,6 +88,7 @@ app.use('/api/exams', apiLimiter, examRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/attempts', apiLimiter, attemptRoutes);
 app.use('/api/integrity', apiLimiter, integrityRoutes);
+app.use('/api/ai-practice', apiLimiter, aiPracticeRoutes);
 
 // Static assets & SPA fallback (serves built React frontend from client/dist)
 const clientDistPath = path.resolve(__dirname, '../../client/dist');

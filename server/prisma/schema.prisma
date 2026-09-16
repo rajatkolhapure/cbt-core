@@ -78,11 +78,12 @@ model User {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  attempts         Attempt[]
-  examAssignments  ExamAssignment[]
-  examSessions     ExamSession[]
-  integrityEvents  IntegrityEvent[]
-  hardwareProfiles HardwareProfile[]
+  attempts           Attempt[]
+  examAssignments    ExamAssignment[]
+  examSessions       ExamSession[]
+  integrityEvents    IntegrityEvent[]
+  hardwareProfiles   HardwareProfile[]
+  aiPracticeSessions AiPracticeSession[]
 
   @@map("users")
 }
@@ -341,3 +342,57 @@ model OtpToken {
   @@index([email])
   @@map("otp_tokens")
 }
+
+enum PracticeMode {
+  ARCADE      // Immediate feedback, streaks, XP rewards
+  TEST        // Formal exam conditions, +4/-1 scoring, end-of-test scorecard
+}
+
+enum SessionDurationType {
+  TIMED           // 10m, 15m, 30m countdown
+  QUESTION_COUNT  // 10, 20, 30 questions
+  ENDLESS         // Solve until user decides to exit
+}
+
+model AiQuestionPool {
+  id            String       @id @default(uuid())
+  subject       String       // Physics, Chemistry, Mathematics
+  chapter       String
+  subtopic      String
+  type          QuestionType @default(SINGLE_CHOICE)
+  difficulty    Difficulty   @default(MEDIUM)
+  text          String       // Formatted with KaTeX ($...$ or $$...$$)
+  options       Json         // Array of { key: "A"|"B"|"C"|"D", text: string }
+  correctOption String       // "A", "B", "C", or "D"
+  solutionText  String       // Step-by-step derivation with KaTeX
+  timesServed   Int          @default(0)
+  createdAt     DateTime     @default(now())
+
+  @@index([subject, chapter, subtopic])
+  @@map("ai_question_pool")
+}
+
+model AiPracticeSession {
+  id             String              @id @default(uuid())
+  userId         String              @map("user_id")
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mode           PracticeMode        @default(ARCADE)
+  durationType   SessionDurationType @default(ENDLESS)
+  targetDuration Int?                // In minutes (for TIMED)
+  targetCount    Int?                // Number of questions (for QUESTION_COUNT)
+  selectedTopics Json                // { subject, chapter, subtopics: string[], difficulty }
+  score          Float               @default(0.0)
+  xpEarned       Int                 @default(0)
+  streak         Int                 @default(0)
+  highestStreak  Int                 @default(0)
+  totalAttempted Int                 @default(0)
+  correctCount   Int                 @default(0)
+  incorrectCount Int                 @default(0)
+  isCompleted    Boolean             @default(false)
+  answers        Json                @default("[]") // Detailed logs for scorecard
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@map("ai_practice_sessions")
+}
+
