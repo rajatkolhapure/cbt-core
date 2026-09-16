@@ -1,31 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-interface FoxCadetMascotProps {
+export interface FoxCadetMascotProps {
   isPasswordFocused?: boolean;
+  isError?: boolean;
+  isSuccess?: boolean;
+  mousePosition?: { x: number; y: number };
   className?: string;
 }
 
 export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
   isPasswordFocused = false,
+  isError = false,
+  isSuccess = false,
+  mousePosition,
   className = '',
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [pupilOffset, setPupilOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isBlinking, setIsBlinking] = useState(false);
 
-  // Periodic gentle eye blinking (every 4-6 seconds)
+  // Periodic eye blinking (every 4-6s)
   useEffect(() => {
     let blinkTimeout: any;
     let cycleInterval: any;
 
     const scheduleBlink = () => {
-      const nextDelay = 3500 + Math.random() * 2500;
+      const nextDelay = 3600 + Math.random() * 2400;
       cycleInterval = setTimeout(() => {
         setIsBlinking(true);
         blinkTimeout = setTimeout(() => {
           setIsBlinking(false);
           scheduleBlink();
-        }, 160);
+        }, 150);
       }, nextDelay);
     };
 
@@ -37,21 +43,21 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
     };
   }, []);
 
-  // Smooth cursor tracking clamped within +/- 4.5px
+  // Calculate pupil offset from mousePosition prop or fallback to window tracking
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isPasswordFocused || !svgRef.current) {
-        setPupilOffset({ x: 0, y: 0 });
-        return;
-      }
+    if (isPasswordFocused || isSuccess) {
+      setPupilOffset({ x: 0, y: 0 });
+      return;
+    }
 
+    const computePupil = (clientX: number, clientY: number) => {
+      if (!svgRef.current) return;
       const rect = svgRef.current.getBoundingClientRect();
-      // Target the mascot's eye level (roughly at 42% height of SVG)
-      const mascotCenterX = rect.left + rect.width / 2;
-      const mascotCenterY = rect.top + rect.height * 0.42;
+      const eyeCenterX = rect.left + rect.width / 2;
+      const eyeCenterY = rect.top + rect.height * 0.44;
 
-      const deltaX = e.clientX - mascotCenterX;
-      const deltaY = e.clientY - mascotCenterY;
+      const deltaX = clientX - eyeCenterX;
+      const deltaY = clientY - eyeCenterY;
       const distance = Math.hypot(deltaX, deltaY);
 
       if (distance === 0) {
@@ -59,51 +65,42 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
         return;
       }
 
-      // Clamped radius: max 4.2px offset
       const maxRadius = 4.2;
-      const pullFactor = Math.min(1, distance / 320);
+      const pull = Math.min(1, distance / 280);
       const angle = Math.atan2(deltaY, deltaX);
 
       setPupilOffset({
-        x: Math.cos(angle) * maxRadius * pullFactor,
-        y: Math.sin(angle) * maxRadius * pullFactor,
+        x: Math.cos(angle) * maxRadius * pull,
+        y: Math.sin(angle) * maxRadius * pull,
       });
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [isPasswordFocused]);
+    if (mousePosition && (mousePosition.x !== 0 || mousePosition.y !== 0)) {
+      computePupil(mousePosition.x, mousePosition.y);
+    } else {
+      const handleWindowMouse = (e: MouseEvent) => computePupil(e.clientX, e.clientY);
+      window.addEventListener('mousemove', handleWindowMouse, { passive: true });
+      return () => window.removeEventListener('mousemove', handleWindowMouse);
+    }
+  }, [mousePosition, isPasswordFocused, isSuccess]);
 
   return (
     <div className={`relative flex flex-col items-center select-none ${className}`}>
-      {/* SVG Style Definition for Hardware Accelerated Keyframes */}
       <style>{`
-        @keyframes mascotHover {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-5px);
-          }
+        @keyframes chibiFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
         }
-        @keyframes shadowPulse {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.35;
-          }
-          50% {
-            transform: scale(0.92);
-            opacity: 0.22;
-          }
+        @keyframes shadowBreathe {
+          0%, 100% { transform: scale(1); opacity: 0.35; }
+          50% { transform: scale(0.9); opacity: 0.2; }
         }
-        .animate-mascot-hover {
-          animation: mascotHover 4.2s ease-in-out infinite;
+        .animate-chibi-float {
+          animation: chibiFloat 4s ease-in-out infinite;
           transform-origin: center bottom;
         }
-        .animate-shadow-pulse {
-          animation: shadowPulse 4.2s ease-in-out infinite;
+        .animate-shadow-breathe {
+          animation: shadowBreathe 4s ease-in-out infinite;
           transform-origin: center;
         }
       `}</style>
@@ -111,253 +108,280 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
       <svg
         ref={svgRef}
         viewBox="0 0 320 340"
-        className="w-full h-full max-w-[340px] drop-shadow-xl overflow-visible"
+        className="w-full h-full max-w-[340px] drop-shadow-2xl overflow-visible"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          {/* Subtle Helmet Specular Gradient */}
-          <linearGradient id="helmetSheen" x1="100" y1="50" x2="220" y2="240" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.18" />
-            <stop offset="45%" stopColor="#E2B150" stopOpacity="0.08" />
-            <stop offset="100%" stopColor="#0B0F17" stopOpacity="0.25" />
+          {/* Muted Terracotta Fur Gradient */}
+          <linearGradient id="chibiFur" x1="160" y1="70" x2="160" y2="230" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#D96338" />
+            <stop offset="100%" stopColor="#B64B22" />
           </linearGradient>
 
-          {/* Polarized Visor Tint Gradient for Password "No Peeking" */}
-          <linearGradient id="polarizedVisor" x1="160" y1="60" x2="160" y2="240" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#0B132B" stopOpacity="0.95" />
-            <stop offset="60%" stopColor="#1C2541" stopOpacity="0.92" />
-            <stop offset="100%" stopColor="#3A506B" stopOpacity="0.88" />
+          {/* Helmet Dome Specular Sheen */}
+          <linearGradient id="glassDomeSheen" x1="90" y1="40" x2="230" y2="260" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.22" />
+            <stop offset="40%" stopColor="#E2B150" stopOpacity="0.08" />
+            <stop offset="100%" stopColor="#0B0F17" stopOpacity="0.2" />
           </linearGradient>
 
-          {/* Warm Fur Shadows */}
-          <linearGradient id="furShade" x1="160" y1="90" x2="160" y2="210" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#D46137" />
-            <stop offset="100%" stopColor="#B34924" />
+          {/* Polarized Visor Tint for "No Peeking" */}
+          <linearGradient id="polarizedVisorTint" x1="160" y1="50" x2="160" y2="250" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#0B132B" stopOpacity="0.96" />
+            <stop offset="60%" stopColor="#1C2541" stopOpacity="0.94" />
+            <stop offset="100%" stopColor="#3A506B" stopOpacity="0.9" />
           </linearGradient>
 
-          {/* Eye socket clips */}
-          <clipPath id="leftEyeClip">
-            <ellipse cx="127" cy="144" rx="10.5" ry="12" />
+          {/* Eye Socket Clips */}
+          <clipPath id="chibiLeftEyeClip">
+            <ellipse cx="124" cy="148" rx="12" ry="14" />
           </clipPath>
-          <clipPath id="rightEyeClip">
-            <ellipse cx="193" cy="144" rx="10.5" ry="12" />
+          <clipPath id="chibiRightEyeClip">
+            <ellipse cx="196" cy="148" rx="12" ry="14" />
           </clipPath>
 
-          {/* Helmet Glass Clip to contain visor effects */}
-          <clipPath id="helmetDomeClip">
-            <circle cx="160" cy="148" r="95" />
+          {/* Helmet Glass Clip */}
+          <clipPath id="chibiHelmetClip">
+            <circle cx="160" cy="150" r="102" />
           </clipPath>
         </defs>
 
         {/* Ambient Ground Contact Shadow */}
         <ellipse
           cx="160"
-          cy="325"
-          rx="72"
-          ry="9"
+          cy="326"
+          rx="76"
+          ry="10"
           fill="#05070B"
-          className="animate-shadow-pulse"
+          className="animate-shadow-breathe"
         />
 
-        {/* --- MAIN CHARACTER GROUP (Hover/Breathing Loop) --- */}
-        <g className="animate-mascot-hover">
+        {/* --- MAIN CHIBI FLOAT GROUP (1.5:1 Head to Torso Ratio) --- */}
+        <g className="animate-chibi-float">
 
           {/* ========================================================= */}
-          {/* 1. SUITED BODY & FLIGHT COLLAR */}
+          {/* 1. COMPACT SUITED TORSO & SPACE COLLAR                     */}
           {/* ========================================================= */}
-          <g id="flightSuit">
-            {/* Shoulders & Torso */}
+          <g id="compactTorso">
+            {/* Suited Shoulders */}
             <path
-              d="M 96 244 C 74 260 58 290 54 326 L 266 326 C 262 290 246 260 224 244 Z"
+              d="M 104 250 C 82 264 68 290 64 322 L 256 322 C 252 290 238 264 216 250 Z"
               fill="#1B263B"
               stroke="#141824"
-              strokeWidth="3"
+              strokeWidth="2.5"
               strokeLinejoin="round"
             />
-            {/* Flight Suit Seams & Padding */}
+
+            {/* Tactical Seams */}
             <path
-              d="M 120 252 L 105 326 M 200 252 L 215 326"
+              d="M 124 258 L 112 322 M 196 258 L 208 322"
               stroke="#2C3D5A"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            {/* Center Zip Line */}
+            <path
+              d="M 160 266 L 160 322"
+              stroke="#141824"
               strokeWidth="2.5"
               strokeLinecap="round"
             />
-            {/* Center Utility Zip Line */}
-            <path
-              d="M 160 262 L 160 326"
-              stroke="#141824"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            {/* Cadet Mission Patch Badge (Muted Gold & Slate) */}
+
+            {/* Cadet Mission Insignia */}
             <g transform="translate(182, 280)">
               <polygon
-                points="0,0 22,0 26,14 11,24 -4,14"
+                points="0,0 20,0 24,12 10,20 -4,12"
                 fill="#24344D"
                 stroke="#C88A2D"
-                strokeWidth="2"
+                strokeWidth="1.8"
               />
-              <circle cx="11" cy="9" r="4.5" fill="#C88A2D" />
-              <line x1="6" y1="16" x2="16" y2="16" stroke="#E2B150" strokeWidth="1.5" />
+              <circle cx="10" cy="8" r="3.5" fill="#C88A2D" />
             </g>
 
-            {/* Astronaut Neck Ring / Base Collar */}
+            {/* Astronaut Collar Ring */}
             <rect
-              x="108"
-              y="232"
-              width="104"
+              x="106"
+              y="238"
+              width="108"
               height="20"
               rx="9"
               fill="#2B3A52"
               stroke="#141824"
-              strokeWidth="3"
+              strokeWidth="2.5"
             />
-            {/* Mechanical Collar Fasteners / Rivets */}
-            <circle cx="124" cy="242" r="3" fill="#8EA0B8" stroke="#141824" strokeWidth="1.5" />
-            <circle cx="160" cy="242" r="3" fill="#C88A2D" stroke="#141824" strokeWidth="1.5" />
-            <circle cx="196" cy="242" r="3" fill="#8EA0B8" stroke="#141824" strokeWidth="1.5" />
+            {/* Mechanical Collar Bolts */}
+            <circle cx="122" cy="248" r="2.8" fill="#8EA0B8" stroke="#141824" strokeWidth="1.2" />
+            <circle cx="160" cy="248" r="2.8" fill="#C88A2D" stroke="#141824" strokeWidth="1.2" />
+            <circle cx="198" cy="248" r="2.8" fill="#8EA0B8" stroke="#141824" strokeWidth="1.2" />
           </g>
 
           {/* ========================================================= */}
-          {/* 2. FOX EARS (Behind the Visor) */}
+          {/* 2. CHIBI FOX EARS (With Distinct Dark Charcoal Tips)       */}
           {/* ========================================================= */}
           <g id="foxEars">
             {/* Left Ear */}
             <g
               style={{
-                transformOrigin: '108px 115px',
-                transform: isPasswordFocused ? 'rotate(-9deg)' : 'rotate(0deg)',
+                transformOrigin: '102px 112px',
+                transform: isPasswordFocused
+                  ? 'rotate(-9deg)'
+                  : isError
+                  ? 'rotate(-6deg) translateY(2px)'
+                  : isSuccess
+                  ? 'rotate(-3deg) translateY(-2px)'
+                  : 'rotate(0deg)',
                 transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
               }}
             >
-              {/* Outer Ear */}
+              {/* Outer Ear Body */}
               <path
-                d="M 104 115 L 72 45 C 92 48 116 68 126 102 Z"
-                fill="url(#furShade)"
+                d="M 98 116 L 62 42 C 86 46 114 66 126 102 Z"
+                fill="url(#chibiFur)"
                 stroke="#141824"
-                strokeWidth="3"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+              {/* Dark Ear Tip */}
+              <path
+                d="M 62 42 L 78 56 C 80 50 82 46 86 46 Z"
+                fill="#161B26"
+                stroke="#141824"
+                strokeWidth="1.5"
                 strokeLinejoin="round"
               />
               {/* Inner Ear Cream */}
               <path
-                d="M 99 108 L 81 58 C 96 66 111 82 118 102 Z"
-                fill="#F7F3EB"
-              />
-              {/* Inner Ear Fluff Tuft */}
-              <path
-                d="M 94 92 C 104 88 108 94 114 88"
-                stroke="#D8CFBE"
-                strokeWidth="2"
-                strokeLinecap="round"
-                fill="none"
+                d="M 94 108 L 74 58 C 90 66 108 82 116 102 Z"
+                fill="#FBF7F0"
               />
             </g>
 
             {/* Right Ear */}
             <g
               style={{
-                transformOrigin: '212px 115px',
-                transform: isPasswordFocused ? 'rotate(9deg)' : 'rotate(0deg)',
+                transformOrigin: '218px 112px',
+                transform: isPasswordFocused
+                  ? 'rotate(9deg)'
+                  : isError
+                  ? 'rotate(6deg) translateY(2px)'
+                  : isSuccess
+                  ? 'rotate(3deg) translateY(-2px)'
+                  : 'rotate(0deg)',
                 transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
               }}
             >
-              {/* Outer Ear */}
+              {/* Outer Ear Body */}
               <path
-                d="M 216 115 L 248 45 C 228 48 204 68 194 102 Z"
-                fill="url(#furShade)"
+                d="M 222 116 L 258 42 C 234 46 206 66 194 102 Z"
+                fill="url(#chibiFur)"
                 stroke="#141824"
-                strokeWidth="3"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+              {/* Dark Ear Tip */}
+              <path
+                d="M 258 42 L 242 56 C 240 50 238 46 234 46 Z"
+                fill="#161B26"
+                stroke="#141824"
+                strokeWidth="1.5"
                 strokeLinejoin="round"
               />
               {/* Inner Ear Cream */}
               <path
-                d="M 221 108 L 239 58 C 224 66 209 82 202 102 Z"
-                fill="#F7F3EB"
+                d="M 226 108 L 246 58 C 230 66 212 82 204 102 Z"
+                fill="#FBF7F0"
               />
-              {/* Inner Ear Fluff Tuft */}
+            </g>
+          </g>
+
+          {/* ========================================================= */}
+          {/* 3. CHIBI FOX HEAD (1.5:1 Expressive Ratio)                 */}
+          {/* ========================================================= */}
+          <g id="foxHead">
+            {/* Expressive Crown & Cheeks */}
+            <path
+              d="M 106 102 C 106 102 128 88 160 88 C 192 88 214 102 214 102 C 236 120 248 150 248 172 C 248 202 216 220 160 220 C 104 220 72 202 72 172 C 72 150 84 120 106 102 Z"
+              fill="url(#chibiFur)"
+              stroke="#141824"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+
+            {/* Clean Cream Muzzle Wedge */}
+            <path
+              d="M 160 140 C 142 140 114 160 96 176 C 112 206 142 218 160 218 C 178 218 208 206 224 176 C 206 160 178 140 160 140 Z"
+              fill="#FBF7F0"
+              stroke="#141824"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+
+            {/* Subtle Cheek Fluff Tuft (Clean Ink Strokes) */}
+            <path
+              d="M 84 170 L 74 174 L 86 180 M 236 170 L 246 174 L 234 180"
+              stroke="#141824"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+
+            {/* Tiny Button Nose */}
+            <g id="tinyNose">
               <path
-                d="M 226 92 C 216 88 212 94 206 88"
-                stroke="#D8CFBE"
+                d="M 154 175 C 154 172 157 170 160 170 C 163 170 166 172 166 175 C 166 178 162 181 160 181 C 158 181 154 178 154 175 Z"
+                fill="#161B26"
+              />
+              <circle cx="158.5" cy="173" r="0.9" fill="#FFFFFF" opacity="0.8" />
+            </g>
+
+            {/* Confident Gentle Smile Line */}
+            <path
+              d="M 160 181 L 160 187"
+              stroke="#141824"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            {isSuccess ? (
+              // Open cheerful happy mouth
+              <path
+                d="M 152 187 Q 160 196 168 187 Z"
+                fill="#B64B22"
+                stroke="#141824"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            ) : isError ? (
+              // Slight curious/concerned wavy mouth
+              <path
+                d="M 152 189 Q 156 186 160 188 Q 164 190 168 187"
+                stroke="#141824"
                 strokeWidth="2"
                 strokeLinecap="round"
                 fill="none"
               />
-            </g>
-          </g>
-
-          {/* ========================================================= */}
-          {/* 3. FOX HEAD & PROFILE */}
-          {/* ========================================================= */}
-          <g id="foxHead">
-            {/* Cheeks & Head Crown Base */}
-            <path
-              d="M 112 106 C 112 106 132 94 160 94 C 188 94 208 106 208 106 C 226 122 236 150 236 168 C 236 194 208 210 160 210 C 112 210 84 194 84 168 C 84 150 94 122 112 106 Z"
-              fill="url(#furShade)"
-              stroke="#141824"
-              strokeWidth="3"
-              strokeLinejoin="round"
-            />
-
-            {/* Cream Face Wedge & Muzzle */}
-            <path
-              d="M 160 138 C 144 138 120 156 102 170 C 116 196 142 208 160 208 C 178 208 204 196 218 170 C 200 156 176 138 160 138 Z"
-              fill="#F7F3EB"
-              stroke="#141824"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-
-            {/* Cheek Fluff Accents */}
-            <path
-              d="M 94 164 L 84 168 L 95 174 M 226 164 L 236 168 L 225 174"
-              stroke="#141824"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-
-            {/* Nose (Warm Charcoal with soft highlight) */}
-            <g id="foxNose">
+            ) : (
+              // Confident calm smile
               <path
-                d="M 152 171 C 152 168 156 166 160 166 C 164 166 168 168 168 171 C 168 175 162 178 160 178 C 158 178 152 175 152 171 Z"
-                fill="#161B26"
+                d="M 152 186 Q 160 191 168 186"
+                stroke="#141824"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
               />
-              <ellipse cx="158" cy="168.5" rx="1.6" ry="0.9" fill="#FFFFFF" opacity="0.8" />
-            </g>
+            )}
 
-            {/* Mouth / Muzzle Center Line */}
+            {/* Studious Whisker Eyebrow Arcs */}
             <path
-              d="M 160 178 L 160 185"
-              stroke="#141824"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            {/* Studious Calm Smile */}
-            <path
-              d="M 153 184 Q 160 188 167 184"
-              stroke="#141824"
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-            />
-
-            {/* Whisker Dots (Subtle) */}
-            <circle cx="145" cy="177" r="1" fill="#7C808E" />
-            <circle cx="142" cy="181" r="1" fill="#7C808E" />
-            <circle cx="175" cy="177" r="1" fill="#7C808E" />
-            <circle cx="178" cy="181" r="1" fill="#7C808E" />
-
-            {/* Studious Whisker Eyebrows / Fur Markings */}
-            <path
-              d="M 120 126 Q 128 122 138 126"
+              d="M 114 128 Q 124 122 136 128"
               stroke="#141824"
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
             />
             <path
-              d="M 200 126 Q 192 122 182 126"
+              d="M 206 128 Q 196 122 184 128"
               stroke="#141824"
               strokeWidth="2.5"
               strokeLinecap="round"
@@ -365,133 +389,154 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
             />
 
             {/* ========================================================= */}
-            {/* 4. EYES & PUPILS (Interactive Cursor Tracking) */}
+            {/* 4. LARGE EXPRESSIVE ANIME EYES (Dual Specular Highlights)  */}
             {/* ========================================================= */}
-            <g id="foxEyes">
-              {/* Left Eye White Socket */}
-              <g clipPath="url(#leftEyeClip)">
-                <ellipse cx="127" cy="144" rx="10.5" ry="12" fill="#FFFFFF" stroke="#141824" strokeWidth="2.5" />
-                {/* Left Pupil (Amber/Slate with Specular Highlight) */}
+            {isSuccess ? (
+              // Happy curved closed eyes (^ _ ^)
+              <g id="happyEyes">
+                <path
+                  d="M 112 148 Q 124 136 136 148"
+                  stroke="#141824"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <path
+                  d="M 184 148 Q 196 136 208 148"
+                  stroke="#141824"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </g>
+            ) : (
+              <g id="animeEyes">
+                {/* Left Eye */}
+                <g clipPath="url(#chibiLeftEyeClip)">
+                  <ellipse cx="124" cy="148" rx="12" ry="14" fill="#FFFFFF" stroke="#141824" strokeWidth="2.5" />
+                  {/* Left Pupil with dual specular highlights */}
+                  <g
+                    style={{
+                      transform: `translate(${pupilOffset.x}px, ${pupilOffset.y}px)`,
+                      transition: 'transform 100ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+                    }}
+                  >
+                    <ellipse cx="124" cy="148" rx="7.5" ry="9" fill="#141824" />
+                    <ellipse cx="124" cy="148" rx="6.2" ry="7.6" fill="#C88A2D" />
+                    <circle cx="124" cy="148" r="4.2" fill="#0E121B" />
+                    {/* Primary Large Specular Catchlight */}
+                    <circle cx="121.5" cy="144" r="2.4" fill="#FFFFFF" />
+                    {/* Secondary Small Specular Sparkle */}
+                    <circle cx="126" cy="151.5" r="1.1" fill="#FFFFFF" />
+                  </g>
+                </g>
+
+                {/* Right Eye */}
+                <g clipPath="url(#chibiRightEyeClip)">
+                  <ellipse cx="196" cy="148" rx="12" ry="14" fill="#FFFFFF" stroke="#141824" strokeWidth="2.5" />
+                  {/* Right Pupil with dual specular highlights */}
+                  <g
+                    style={{
+                      transform: `translate(${pupilOffset.x}px, ${pupilOffset.y}px)`,
+                      transition: 'transform 100ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+                    }}
+                  >
+                    <ellipse cx="196" cy="148" rx="7.5" ry="9" fill="#141824" />
+                    <ellipse cx="196" cy="148" rx="6.2" ry="7.6" fill="#C88A2D" />
+                    <circle cx="196" cy="148" r="4.2" fill="#0E121B" />
+                    {/* Primary Large Specular Catchlight */}
+                    <circle cx="193.5" cy="144" r="2.4" fill="#FFFFFF" />
+                    {/* Secondary Small Specular Sparkle */}
+                    <circle cx="198" cy="151.5" r="1.1" fill="#FFFFFF" />
+                  </g>
+                </g>
+
+                {/* Eye Contours */}
+                <ellipse cx="124" cy="148" rx="12" ry="14" fill="none" stroke="#141824" strokeWidth="2.5" />
+                <ellipse cx="196" cy="148" rx="12" ry="14" fill="none" stroke="#141824" strokeWidth="2.5" />
+
+                {/* Eye Blink Cover */}
                 <g
                   style={{
-                    transform: `translate(${pupilOffset.x}px, ${pupilOffset.y}px)`,
-                    transition: 'transform 110ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+                    opacity: isBlinking ? 1 : 0,
+                    transition: 'opacity 60ms ease-out',
                   }}
                 >
-                  <circle cx="127" cy="144" r="6.2" fill="#141824" />
-                  <circle cx="127" cy="144" r="5.2" fill="#C88A2D" />
-                  <circle cx="127" cy="144" r="3.8" fill="#10141D" />
-                  {/* Eye Catchlight Reflection */}
-                  <circle cx="125" cy="142" r="1.6" fill="#FFFFFF" />
-                  <circle cx="128.5" cy="145.5" r="0.7" fill="#FFFFFF" />
+                  <ellipse cx="124" cy="148" rx="12.5" ry="14.5" fill="url(#chibiFur)" />
+                  <path d="M 112 149 Q 124 154 136 149" stroke="#141824" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                  <ellipse cx="196" cy="148" rx="12.5" ry="14.5" fill="url(#chibiFur)" />
+                  <path d="M 184 149 Q 196 154 208 149" stroke="#141824" strokeWidth="2.5" strokeLinecap="round" fill="none" />
                 </g>
               </g>
-
-              {/* Right Eye White Socket */}
-              <g clipPath="url(#rightEyeClip)">
-                <ellipse cx="193" cy="144" rx="10.5" ry="12" fill="#FFFFFF" stroke="#141824" strokeWidth="2.5" />
-                {/* Right Pupil */}
-                <g
-                  style={{
-                    transform: `translate(${pupilOffset.x}px, ${pupilOffset.y}px)`,
-                    transition: 'transform 110ms cubic-bezier(0.2, 0.8, 0.2, 1)',
-                  }}
-                >
-                  <circle cx="193" cy="144" r="6.2" fill="#141824" />
-                  <circle cx="193" cy="144" r="5.2" fill="#C88A2D" />
-                  <circle cx="193" cy="144" r="3.8" fill="#10141D" />
-                  {/* Eye Catchlight Reflection */}
-                  <circle cx="191" cy="142" r="1.6" fill="#FFFFFF" />
-                  <circle cx="194.5" cy="145.5" r="0.7" fill="#FFFFFF" />
-                </g>
-              </g>
-
-              {/* Eye Contours */}
-              <ellipse cx="127" cy="144" rx="10.5" ry="12" fill="none" stroke="#141824" strokeWidth="2.5" />
-              <ellipse cx="193" cy="144" rx="10.5" ry="12" fill="none" stroke="#141824" strokeWidth="2.5" />
-
-              {/* Natural Eye Blinking Overlay */}
-              <g
-                style={{
-                  opacity: isBlinking ? 1 : 0,
-                  transition: 'opacity 60ms ease-out',
-                }}
-              >
-                <ellipse cx="127" cy="144" rx="11" ry="12.5" fill="url(#furShade)" />
-                <path d="M 116 145 Q 127 150 138 145" stroke="#141824" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                <ellipse cx="193" cy="144" rx="11" ry="12.5" fill="url(#furShade)" />
-                <path d="M 182 145 Q 193 150 204 145" stroke="#141824" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-              </g>
-            </g>
+            )}
           </g>
 
           {/* ========================================================= */}
-          {/* 5. CLEAR BUBBLE HELMET & VISOR */}
+          {/* 5. PERFECT SPHERICAL BUBBLE HELMET & VISOR                 */}
           {/* ========================================================= */}
-          <g id="astronautHelmet">
-            {/* Clear Helmet Glass Sphere */}
+          <g id="bubbleHelmet">
+            {/* Perfectly Spherical Helmet Glass */}
             <circle
               cx="160"
-              cy="148"
-              r="95"
-              fill="url(#helmetSheen)"
+              cy="150"
+              r="102"
+              fill="url(#glassDomeSheen)"
               stroke="#141824"
-              strokeWidth="3.5"
+              strokeWidth="2.8"
             />
 
-            {/* Visor Glare / Specular Arc (Warm Gold & White) */}
+            {/* Elegant Specular Glass Reflection Highlights */}
             <path
-              d="M 92 108 A 82 82 0 0 1 204 74"
+              d="M 88 108 A 90 90 0 0 1 208 70"
               stroke="#E2B150"
-              strokeWidth="4.5"
+              strokeWidth="4"
               strokeLinecap="round"
-              strokeOpacity="0.45"
+              strokeOpacity="0.4"
               fill="none"
             />
             <path
-              d="M 85 132 A 84 84 0 0 1 122 86"
+              d="M 82 134 A 92 92 0 0 1 122 84"
               stroke="#FFFFFF"
-              strokeWidth="3"
+              strokeWidth="2.8"
               strokeLinecap="round"
               strokeOpacity="0.5"
               fill="none"
             />
-            {/* Secondary Lower Reflection Arc */}
             <path
-              d="M 218 190 A 82 82 0 0 1 176 226"
+              d="M 226 196 A 90 90 0 0 1 180 234"
               stroke="#FFFFFF"
-              strokeWidth="2.5"
+              strokeWidth="2.2"
               strokeLinecap="round"
-              strokeOpacity="0.25"
+              strokeOpacity="0.22"
               fill="none"
             />
 
-            {/* Polarized Visor Shield Slide-Down (Triggered on password focus) */}
-            <g clipPath="url(#helmetDomeClip)">
+            {/* Polarized Visor Shield Slide-Down (Password Focus "No Peeking") */}
+            <g clipPath="url(#chibiHelmetClip)">
               <rect
-                x="60"
-                y="50"
-                width="200"
-                height="200"
-                fill="url(#polarizedVisor)"
+                x="50"
+                y="40"
+                width="220"
+                height="220"
+                fill="url(#polarizedVisorTint)"
                 style={{
-                  opacity: isPasswordFocused ? 0.88 : 0,
-                  transform: isPasswordFocused ? 'translateY(0px)' : 'translateY(-140px)',
+                  opacity: isPasswordFocused ? 0.92 : 0,
+                  transform: isPasswordFocused ? 'translateY(0px)' : 'translateY(-150px)',
                   transition: 'transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.35s ease',
                 }}
               />
-              {/* Polarized Horizon Golden Stripe */}
+              {/* Polarized Gold Stripe */}
               <line
-                x1="65"
-                y1="148"
-                x2="255"
-                y2="148"
+                x1="60"
+                y1="150"
+                x2="260"
+                y2="150"
                 stroke="#C88A2D"
-                strokeWidth="3"
-                strokeOpacity="0.75"
+                strokeWidth="2.8"
+                strokeOpacity="0.8"
                 style={{
                   opacity: isPasswordFocused ? 1 : 0,
-                  transform: isPasswordFocused ? 'translateY(0px)' : 'translateY(-140px)',
+                  transform: isPasswordFocused ? 'translateY(0px)' : 'translateY(-150px)',
                   transition: 'transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.35s ease',
                 }}
               />
@@ -499,39 +544,34 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
           </g>
 
           {/* ========================================================= */}
-          {/* 6. SUITED PAWS ("NO PEEKING" REACTION) */}
+          {/* 6. SUITED PAWS ("NO PEEKING" COVER)                       */}
           {/* ========================================================= */}
-          {/* In default state, paws rest quietly near chest / bottom edge.
-              When isPasswordFocused is true, paws translate up to cover the visor! */}
           <g id="astronautPaws">
             {/* Left Suited Paw */}
             <g
               style={{
                 transform: isPasswordFocused
-                  ? 'translate(8px, -74px) rotate(-14deg)'
+                  ? 'translate(8px, -78px) rotate(-14deg)'
                   : 'translate(0px, 0px) rotate(0deg)',
-                transformOrigin: '110px 245px',
+                transformOrigin: '110px 248px',
                 transition: 'transform 0.45s cubic-bezier(0.34, 1.45, 0.64, 1)',
               }}
             >
-              {/* White/Parchment Suited Glove */}
               <path
-                d="M 92 235 C 92 220 108 208 122 208 C 134 208 142 216 142 228 C 142 236 138 244 132 250 L 98 250 C 94 246 92 240 92 235 Z"
+                d="M 94 238 C 94 222 110 210 124 210 C 136 210 144 218 144 230 C 144 238 140 246 134 252 L 98 252 C 96 248 94 244 94 238 Z"
                 fill="#F4EFEA"
                 stroke="#141824"
-                strokeWidth="3"
+                strokeWidth="2.5"
                 strokeLinejoin="round"
               />
-              {/* Glove Pad Grip Accents */}
-              <ellipse cx="120" cy="226" rx="5" ry="6" fill="#DCD5C8" stroke="#141824" strokeWidth="1.5" />
-              <circle cx="108" cy="232" r="3" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
-              <circle cx="114" cy="216" r="2.8" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
-              <circle cx="126" cy="216" r="2.8" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
-              {/* Glove Cuff Ring */}
+              <ellipse cx="120" cy="228" rx="5" ry="6" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
+              <circle cx="108" cy="234" r="2.8" fill="#DCD5C8" stroke="#141824" strokeWidth="1" />
+              <circle cx="114" cy="218" r="2.5" fill="#DCD5C8" stroke="#141824" strokeWidth="1" />
+              <circle cx="126" cy="218" r="2.5" fill="#DCD5C8" stroke="#141824" strokeWidth="1" />
               <path
-                d="M 96 250 C 108 254 124 254 134 250"
+                d="M 96 252 C 108 256 124 256 134 252"
                 stroke="#C88A2D"
-                strokeWidth="2.5"
+                strokeWidth="2.2"
                 strokeLinecap="round"
               />
             </g>
@@ -540,30 +580,27 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
             <g
               style={{
                 transform: isPasswordFocused
-                  ? 'translate(-8px, -74px) rotate(14deg)'
+                  ? 'translate(-8px, -78px) rotate(14deg)'
                   : 'translate(0px, 0px) rotate(0deg)',
-                transformOrigin: '210px 245px',
+                transformOrigin: '210px 248px',
                 transition: 'transform 0.45s cubic-bezier(0.34, 1.45, 0.64, 1)',
               }}
             >
-              {/* White/Parchment Suited Glove */}
               <path
-                d="M 228 235 C 228 220 212 208 198 208 C 186 208 178 216 178 228 C 178 236 182 244 188 250 L 222 250 C 226 246 228 240 228 235 Z"
+                d="M 226 238 C 226 222 210 210 196 210 C 184 210 176 218 176 230 C 176 238 180 246 186 252 L 222 252 C 224 248 226 244 226 238 Z"
                 fill="#F4EFEA"
                 stroke="#141824"
-                strokeWidth="3"
+                strokeWidth="2.5"
                 strokeLinejoin="round"
               />
-              {/* Glove Pad Grip Accents */}
-              <ellipse cx="200" cy="226" rx="5" ry="6" fill="#DCD5C8" stroke="#141824" strokeWidth="1.5" />
-              <circle cx="212" cy="232" r="3" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
-              <circle cx="206" cy="216" r="2.8" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
-              <circle cx="194" cy="216" r="2.8" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
-              {/* Glove Cuff Ring */}
+              <ellipse cx="200" cy="228" rx="5" ry="6" fill="#DCD5C8" stroke="#141824" strokeWidth="1.2" />
+              <circle cx="212" cy="234" r="2.8" fill="#DCD5C8" stroke="#141824" strokeWidth="1" />
+              <circle cx="206" cy="218" r="2.5" fill="#DCD5C8" stroke="#141824" strokeWidth="1" />
+              <circle cx="194" cy="218" r="2.5" fill="#DCD5C8" stroke="#141824" strokeWidth="1" />
               <path
-                d="M 186 250 C 196 254 212 254 224 250"
+                d="M 186 252 C 196 256 212 256 224 252"
                 stroke="#C88A2D"
-                strokeWidth="2.5"
+                strokeWidth="2.2"
                 strokeLinecap="round"
               />
             </g>
