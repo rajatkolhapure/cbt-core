@@ -18,6 +18,16 @@ export interface PracticeQuestion {
   solutionText: string;
 }
 
+export interface SelectedTopics {
+  subject?: string;
+  chapter?: string;
+  subtopic?: string;
+  subjects?: string[];
+  chapters?: Record<string, string[]>;
+  isFullSyllabus?: boolean;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+}
+
 export interface PracticeSession {
   id: string;
   userId: string;
@@ -25,12 +35,7 @@ export interface PracticeSession {
   durationType: 'ENDLESS' | 'QUESTION_COUNT' | 'TIMED';
   targetDuration?: number | null;
   targetCount?: number | null;
-  selectedTopics: {
-    subject: string;
-    chapter: string;
-    subtopic?: string;
-    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  };
+  selectedTopics: SelectedTopics;
   score: number;
   xpEarned: number;
   streak: number;
@@ -43,17 +48,29 @@ export interface PracticeSession {
   updatedAt: string;
 }
 
+export interface TestSectionQuestion {
+  id: string;
+  order: number;
+  question: PracticeQuestion & {
+    marks?: number;
+    negativeMarks?: number;
+  };
+}
+
+export interface TestSection {
+  id: string;
+  name: string;
+  order: number;
+  questionCount: number;
+  questions: TestSectionQuestion[];
+}
+
 export interface CreateSessionParams {
   mode: 'ARCADE' | 'TEST';
   durationType: 'ENDLESS' | 'QUESTION_COUNT' | 'TIMED';
   targetDuration?: number;
   targetCount?: number;
-  selectedTopics: {
-    subject: string;
-    chapter: string;
-    subtopic?: string;
-    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  };
+  selectedTopics: SelectedTopics;
 }
 
 export interface AnswerSubmissionResult {
@@ -93,12 +110,16 @@ export interface ScorecardResult {
 export const aiPracticeApi = {
   getTaxonomy: async () => {
     const res = await api.get('/ai-practice/taxonomy');
-    return res.data.taxonomy as Record<string, { chapters: Record<string, string[]> }>;
+    return res.data.taxonomy as Record<string, string[]>;
   },
 
   createSession: async (data: CreateSessionParams) => {
     const res = await api.post('/ai-practice/sessions', data);
-    return res.data as { session: PracticeSession; initialQuestions: PracticeQuestion[] };
+    return res.data as {
+      session: PracticeSession;
+      initialQuestions: PracticeQuestion[];
+      sections?: TestSection[];
+    };
   },
 
   getSession: async (sessionId: string) => {

@@ -14,6 +14,10 @@ import {
   Atom,
   FlaskConical,
   Compass,
+  Search,
+  CheckSquare,
+  Square,
+  ListChecks,
 } from 'lucide-react';
 import { aiPracticeApi } from '../../api/ai-practice';
 
@@ -29,11 +33,15 @@ export const PracticeWizardPage: React.FC = () => {
   const [targetCount, setTargetCount] = useState<number>(20);
   const [targetDuration, setTargetDuration] = useState<number>(15);
 
-  // Taxonomy State
-  const [taxonomy, setTaxonomy] = useState<Record<string, { chapters: Record<string, string[]> }>>({});
-  const [selectedSubject, setSelectedSubject] = useState<string>('Physics');
-  const [selectedChapter, setSelectedChapter] = useState<string>('Rotational Dynamics');
-  const [selectedSubtopic, setSelectedSubtopic] = useState<string>('Moment of Inertia');
+  // Taxonomy & Multi-topic State
+  const [taxonomy, setTaxonomy] = useState<Record<string, string[]>>({});
+  const [selectedChapters, setSelectedChapters] = useState<Record<string, string[]>>({
+    Physics: [],
+    Chemistry: [],
+    Mathematics: [],
+  });
+  const [activeSubjectTab, setActiveSubjectTab] = useState<string>('Physics');
+  const [chapterSearch, setChapterSearch] = useState<string>('');
   const [difficulty, setDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
 
   const [isLoadingTaxonomy, setIsLoadingTaxonomy] = useState<boolean>(true);
@@ -46,20 +54,12 @@ export const PracticeWizardPage: React.FC = () => {
         const data = await aiPracticeApi.getTaxonomy();
         setTaxonomy(data);
 
-        const subjects = Object.keys(data);
-        if (subjects.length > 0) {
-          const firstSubject = subjects[0];
-          setSelectedSubject(firstSubject);
-          const chapters = Object.keys(data[firstSubject].chapters);
-          if (chapters.length > 0) {
-            const firstChapter = chapters[0];
-            setSelectedChapter(firstChapter);
-            const subtopics = data[firstSubject].chapters[firstChapter];
-            if (subtopics && subtopics.length > 0) {
-              setSelectedSubtopic(subtopics[0]);
-            }
-          }
-        }
+        // By default, select all 48 chapters for a comprehensive 12th standard run
+        setSelectedChapters({
+          Physics: data['Physics'] || [],
+          Chemistry: data['Chemistry'] || [],
+          Mathematics: data['Mathematics'] || [],
+        });
       } catch (err) {
         console.error('Failed to load taxonomy:', err);
       } finally {
@@ -70,30 +70,88 @@ export const PracticeWizardPage: React.FC = () => {
     loadTaxonomy();
   }, []);
 
-  // Update chapter & subtopic when subject changes
-  const handleSubjectChange = (subj: string) => {
-    setSelectedSubject(subj);
-    if (taxonomy[subj]?.chapters) {
-      const chapters = Object.keys(taxonomy[subj].chapters);
-      if (chapters.length > 0) {
-        setSelectedChapter(chapters[0]);
-        const subtopics = taxonomy[subj].chapters[chapters[0]];
-        setSelectedSubtopic(subtopics && subtopics.length > 0 ? subtopics[0] : '');
-      }
+  // Quick Preset Actions
+  const handleApplyPreset = (preset: 'FULL_12TH' | 'PHYSICS' | 'CHEMISTRY' | 'MATH') => {
+    if (preset === 'FULL_12TH') {
+      setSelectedChapters({
+        Physics: taxonomy['Physics'] || [],
+        Chemistry: taxonomy['Chemistry'] || [],
+        Mathematics: taxonomy['Mathematics'] || [],
+      });
+    } else if (preset === 'PHYSICS') {
+      setSelectedChapters({
+        Physics: taxonomy['Physics'] || [],
+        Chemistry: [],
+        Mathematics: [],
+      });
+      setActiveSubjectTab('Physics');
+    } else if (preset === 'CHEMISTRY') {
+      setSelectedChapters({
+        Physics: [],
+        Chemistry: taxonomy['Chemistry'] || [],
+        Mathematics: [],
+      });
+      setActiveSubjectTab('Chemistry');
+    } else if (preset === 'MATH') {
+      setSelectedChapters({
+        Physics: [],
+        Chemistry: [],
+        Mathematics: taxonomy['Mathematics'] || [],
+      });
+      setActiveSubjectTab('Mathematics');
     }
   };
 
-  // Update subtopic when chapter changes
-  const handleChapterChange = (chap: string) => {
-    setSelectedChapter(chap);
-    if (taxonomy[selectedSubject]?.chapters[chap]) {
-      const subtopics = taxonomy[selectedSubject].chapters[chap];
-      setSelectedSubtopic(subtopics && subtopics.length > 0 ? subtopics[0] : '');
-    }
+  // Toggle individual chapter
+  const handleToggleChapter = (subject: string, chapter: string) => {
+    setSelectedChapters((prev) => {
+      const list = prev[subject] || [];
+      const exists = list.includes(chapter);
+      return {
+        ...prev,
+        [subject]: exists ? list.filter((c) => c !== chapter) : [...list, chapter],
+      };
+    });
   };
+
+  // Select all chapters for active subject
+  const handleSelectAllForSubject = (subject: string) => {
+    const all = taxonomy[subject] || [];
+    setSelectedChapters((prev) => ({
+      ...prev,
+      [subject]: all,
+    }));
+  };
+
+  // Clear all chapters for active subject
+  const handleClearAllForSubject = (subject: string) => {
+    setSelectedChapters((prev) => ({
+      ...prev,
+      [subject]: [],
+    }));
+  };
+
+  // Total count of selected chapters across all subjects
+  const totalSelectedChapters = Object.values(selectedChapters).reduce(
+    (sum, chaps) => sum + chaps.length,
+    0
+  );
+  const totalAvailableChapters = Object.values(taxonomy).reduce(
+    (sum, chaps) => sum + chaps.length,
+    0
+  );
 
   // Launch Practice Session
   const handleLaunch = async () => {
+    const activeSubjects = Object.keys(selectedChapters).filter(
+      (subj) => selectedChapters[subj]?.length > 0
+    );
+
+    if (activeSubjects.length === 0) {
+      setError('Please select at least one chapter or preset to launch practice.');
+      return;
+    }
+
     setIsLaunching(true);
     setError(null);
 
@@ -104,18 +162,19 @@ export const PracticeWizardPage: React.FC = () => {
         targetDuration: durationType === 'TIMED' ? targetDuration : undefined,
         targetCount: durationType === 'QUESTION_COUNT' ? targetCount : undefined,
         selectedTopics: {
-          subject: selectedSubject,
-          chapter: selectedChapter,
-          subtopic: selectedSubtopic || undefined,
+          subjects: activeSubjects,
+          chapters: selectedChapters,
+          isFullSyllabus: totalSelectedChapters === totalAvailableChapters,
           difficulty,
         },
       });
 
-      // Pass initial batch into navigation state to guarantee 0ms instant display
+      // Pass initial batch and sections into navigation state for zero-latency instant display
       navigate(`/student/practice/${result.session.id}`, {
         state: {
           initialSession: result.session,
           initialQuestions: result.initialQuestions,
+          initialSections: result.sections,
         },
       });
     } catch (err: any) {
@@ -127,9 +186,9 @@ export const PracticeWizardPage: React.FC = () => {
   };
 
   const subjectIcons: Record<string, React.ReactNode> = {
-    Physics: <Atom className="w-5 h-5 text-[#C88A2D]" />,
-    Chemistry: <FlaskConical className="w-5 h-5 text-[#236B47]" />,
-    Mathematics: <Compass className="w-5 h-5 text-[#1A2B4C]" />,
+    Physics: <Atom className="w-4 h-4 text-[#C88A2D]" />,
+    Chemistry: <FlaskConical className="w-4 h-4 text-[#236B47]" />,
+    Mathematics: <Compass className="w-4 h-4 text-[#1A2B4C]" />,
   };
 
   return (
@@ -425,13 +484,13 @@ export const PracticeWizardPage: React.FC = () => {
       {/* STEP 3: TAXONOMY & DIFFICULTY PICKER */}
       {step === 3 && (
         <div className="space-y-6">
-          <div className="border-b border-[#DCD6CD] pb-2 flex items-center justify-between">
+          <div className="border-b border-[#DCD6CD] pb-3 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-lg sm:text-xl font-bold text-[#1C1D21]">
-                Choose Topic &amp; Difficulty
+                Choose Syllabus Topics &amp; Challenge Tier
               </h2>
               <p className="text-xs text-[#575A65] font-mono mt-0.5">
-                Target exact chapters and core subtopics for this run.
+                Select chapters across Class 12 standard (48 total chapters across Physics, Chemistry, and Math).
               </p>
             </div>
             <button
@@ -444,87 +503,257 @@ export const PracticeWizardPage: React.FC = () => {
           </div>
 
           {isLoadingTaxonomy ? (
-            <div className="p-8 text-center font-mono text-xs text-[#575A65]">
-              Loading Syllabus Taxonomy...
+            <div className="p-12 text-center font-mono text-xs text-[#575A65] space-y-2">
+              <div className="w-6 h-6 border-2 border-[#1A2B4C] border-t-transparent rounded-full animate-spin mx-auto" />
+              <p>Loading Complete Class 12 Standard Syllabus (48 Chapters)...</p>
             </div>
           ) : (
-            <div className="space-y-5">
-              {/* Subject Selector */}
+            <div className="space-y-6">
+              {/* 1. Quick Presets Bar */}
               <div>
-                <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#1C1D21] mb-2">
-                  1. Subject
+                <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#1C1D21] mb-2 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#C88A2D]" />
+                  <span>1. Quick Syllabus Presets</span>
                 </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {Object.keys(taxonomy).map((subj) => (
-                    <button
-                      key={subj}
-                      type="button"
-                      onClick={() => handleSubjectChange(subj)}
-                      className={`p-3 border-2 flex items-center justify-center gap-2 font-mono text-xs font-bold transition cursor-pointer ${
-                        selectedSubject === subj
-                          ? 'bg-white border-[#1C1D21] shadow-tactile text-[#1C1D21]'
-                          : 'bg-[#F4EFEA] border-[#DCD6CD] text-[#575A65] hover:bg-white'
-                      }`}
-                    >
-                      {subjectIcons[subj] || <Atom className="w-4 h-4" />}
-                      <span>{subj}</span>
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('FULL_12TH')}
+                    className={`p-3 border-2 text-left transition cursor-pointer flex flex-col justify-between ${
+                      totalSelectedChapters === totalAvailableChapters && totalAvailableChapters > 0
+                        ? 'bg-[#FEF8ED] border-[#C88A2D] shadow-tactile-gold'
+                        : 'bg-white border-[#DCD6CD] hover:border-[#1C1D21]'
+                    }`}
+                  >
+                    <span className="font-mono text-[10px] font-bold uppercase text-[#C88A2D]">
+                      ⚡ All 48 Chapters
+                    </span>
+                    <span className="font-serif text-xs font-bold text-[#1C1D21] mt-1">
+                      Full 12th Standard Mock
+                    </span>
+                    <span className="font-mono text-[10px] text-[#575A65] mt-0.5">
+                      16 Ph + 16 Ch + 16 Ma
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('PHYSICS')}
+                    className={`p-3 border-2 text-left transition cursor-pointer flex flex-col justify-between ${
+                      selectedChapters['Physics']?.length === (taxonomy['Physics']?.length || 16) &&
+                      selectedChapters['Chemistry']?.length === 0 &&
+                      selectedChapters['Mathematics']?.length === 0
+                        ? 'bg-[#FEF8ED] border-[#C88A2D] shadow-tactile-gold'
+                        : 'bg-white border-[#DCD6CD] hover:border-[#1C1D21]'
+                    }`}
+                  >
+                    <span className="font-mono text-[10px] font-bold uppercase text-[#C88A2D]">
+                      ⚛️ 16 Chapters
+                    </span>
+                    <span className="font-serif text-xs font-bold text-[#1C1D21] mt-1">
+                      Physics Complete
+                    </span>
+                    <span className="font-mono text-[10px] text-[#575A65] mt-0.5">
+                      Mechanics, Waves, Modern
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('CHEMISTRY')}
+                    className={`p-3 border-2 text-left transition cursor-pointer flex flex-col justify-between ${
+                      selectedChapters['Chemistry']?.length === (taxonomy['Chemistry']?.length || 16) &&
+                      selectedChapters['Physics']?.length === 0 &&
+                      selectedChapters['Mathematics']?.length === 0
+                        ? 'bg-[#FEF8ED] border-[#236B47] shadow-tactile-emerald'
+                        : 'bg-white border-[#DCD6CD] hover:border-[#1C1D21]'
+                    }`}
+                  >
+                    <span className="font-mono text-[10px] font-bold uppercase text-[#236B47]">
+                      🧪 16 Chapters
+                    </span>
+                    <span className="font-serif text-xs font-bold text-[#1C1D21] mt-1">
+                      Chemistry Complete
+                    </span>
+                    <span className="font-mono text-[10px] text-[#575A65] mt-0.5">
+                      Physical, Inorganic, Organic
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleApplyPreset('MATH')}
+                    className={`p-3 border-2 text-left transition cursor-pointer flex flex-col justify-between ${
+                      selectedChapters['Mathematics']?.length === (taxonomy['Mathematics']?.length || 16) &&
+                      selectedChapters['Physics']?.length === 0 &&
+                      selectedChapters['Chemistry']?.length === 0
+                        ? 'bg-[#FEF8ED] border-[#1A2B4C] shadow-tactile'
+                        : 'bg-white border-[#DCD6CD] hover:border-[#1C1D21]'
+                    }`}
+                  >
+                    <span className="font-mono text-[10px] font-bold uppercase text-[#1A2B4C]">
+                      📐 16 Chapters
+                    </span>
+                    <span className="font-serif text-xs font-bold text-[#1C1D21] mt-1">
+                      Mathematics Complete
+                    </span>
+                    <span className="font-mono text-[10px] text-[#575A65] mt-0.5">
+                      Calculus, Vectors, Probability
+                    </span>
+                  </button>
                 </div>
               </div>
 
-              {/* Chapter Selector */}
+              {/* 2. Subject Tabs & Chapter Checklist */}
               <div>
-                <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#1C1D21] mb-2">
-                  2. Chapter
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1 border border-[#DCD6CD] bg-white">
-                  {taxonomy[selectedSubject]?.chapters &&
-                    Object.keys(taxonomy[selectedSubject].chapters).map((chap) => (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+                  <label className="font-mono text-xs font-bold uppercase tracking-wider text-[#1C1D21] flex items-center gap-1.5">
+                    <ListChecks className="w-3.5 h-3.5 text-[#1A2B4C]" />
+                    <span>2. Select Subject &amp; Chapters</span>
+                  </label>
+
+                  {/* Summary counter badge */}
+                  <div className="inline-flex items-center gap-2 bg-[#F4EFEA] px-3 py-1 border border-[#DCD6CD] font-mono text-xs">
+                    <span className="text-[#575A65]">Total Active:</span>
+                    <span className="font-bold text-[#1C1D21]">
+                      {totalSelectedChapters} / {totalAvailableChapters} Chapters
+                    </span>
+                    {totalSelectedChapters === totalAvailableChapters && totalAvailableChapters > 0 && (
+                      <span className="px-1.5 py-0.2 bg-[#236B47] text-white text-[10px] font-bold">
+                        FULL 12TH SYLLABUS
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Subject Switcher Tabs */}
+                <div className="flex border-b border-[#1C1D21] bg-[#F4EFEA]">
+                  {Object.keys(taxonomy).map((subj) => {
+                    const count = selectedChapters[subj]?.length || 0;
+                    const totalForSubj = taxonomy[subj]?.length || 0;
+                    const isActive = activeSubjectTab === subj;
+
+                    return (
                       <button
-                        key={chap}
+                        key={subj}
                         type="button"
-                        onClick={() => handleChapterChange(chap)}
-                        className={`px-3 py-2 text-left font-mono text-xs border transition cursor-pointer truncate ${
-                          selectedChapter === chap
-                            ? 'bg-[#1A2B4C] text-white border-[#1C1D21] font-bold'
-                            : 'bg-[#FBF9F5] text-[#1C1D21] border-[#E8E2D8] hover:bg-[#F4EFEA]'
+                        onClick={() => {
+                          setActiveSubjectTab(subj);
+                          setChapterSearch('');
+                        }}
+                        className={`flex-1 py-3 px-4 text-xs font-mono font-bold flex items-center justify-center gap-2 border-r border-[#1C1D21] last:border-r-0 transition cursor-pointer ${
+                          isActive
+                            ? 'bg-white text-[#1C1D21] border-b-2 border-b-white -mb-px shadow-xs'
+                            : 'bg-[#EAE3D9] text-[#575A65] hover:bg-[#F4EFEA]'
                         }`}
-                        title={chap}
                       >
-                        {chap}
+                        {subjectIcons[subj]}
+                        <span>{subj}</span>
+                        <span
+                          className={`text-[11px] px-1.5 py-0.2 border ${
+                            count === totalForSubj && totalForSubj > 0
+                              ? 'bg-[#236B47] text-white border-[#236B47]'
+                              : count > 0
+                              ? 'bg-[#C88A2D] text-[#1C1D21] border-[#C88A2D]'
+                              : 'bg-white text-[#8E929E] border-[#DCD6CD]'
+                          }`}
+                        >
+                          {count}/{totalForSubj}
+                        </span>
                       </button>
-                    ))}
+                    );
+                  })}
                 </div>
-              </div>
 
-              {/* Subtopic Selector */}
-              <div>
-                <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#1C1D21] mb-2">
-                  3. Key Focus Subtopic
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {taxonomy[selectedSubject]?.chapters[selectedChapter]?.map((sub) => (
+                {/* Active Subject Toolbar: Search + Select All + Clear */}
+                <div className="bg-white border-l border-r border-[#1C1D21] p-3 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                  <div className="relative w-full sm:w-64">
+                    <Search className="w-3.5 h-3.5 text-[#8E929E] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder={`Search ${activeSubjectTab} chapters...`}
+                      value={chapterSearch}
+                      onChange={(e) => setChapterSearch(e.target.value)}
+                      className="w-full pl-8 pr-3 py-1.5 bg-[#FBF9F5] border border-[#DCD6CD] font-mono text-xs text-[#1C1D21] placeholder-[#8E929E] focus:outline-none focus:border-[#1C1D21]"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                     <button
-                      key={sub}
                       type="button"
-                      onClick={() => setSelectedSubtopic(sub)}
-                      className={`px-3 py-1.5 font-mono text-xs border rounded-full transition cursor-pointer ${
-                        selectedSubtopic === sub
-                          ? 'bg-[#C88A2D] text-[#1C1D21] border-[#1C1D21] font-bold shadow-xs'
-                          : 'bg-white text-[#575A65] border-[#DCD6CD] hover:border-[#1C1D21]'
-                      }`}
+                      onClick={() => handleSelectAllForSubject(activeSubjectTab)}
+                      className="px-2.5 py-1 text-xs font-mono font-bold text-[#1A2B4C] hover:bg-[#F4EFEA] border border-[#1A2B4C] transition cursor-pointer"
                     >
-                      {sub}
+                      Select All 16
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => handleClearAllForSubject(activeSubjectTab)}
+                      className="px-2.5 py-1 text-xs font-mono font-bold text-[#575A65] hover:text-[#A83232] hover:bg-[#FDF0F0] border border-[#DCD6CD] transition cursor-pointer"
+                    >
+                      Clear {activeSubjectTab}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Chapter Checklist Grid */}
+                <div className="bg-white border-l border-r border-b border-[#1C1D21] p-3 max-h-72 overflow-y-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {(taxonomy[activeSubjectTab] || [])
+                      .filter((chap) =>
+                        chap.toLowerCase().includes(chapterSearch.toLowerCase())
+                      )
+                      .map((chap, idx) => {
+                        const isChecked = (selectedChapters[activeSubjectTab] || []).includes(chap);
+
+                        return (
+                          <div
+                            key={chap}
+                            onClick={() => handleToggleChapter(activeSubjectTab, chap)}
+                            className={`p-2.5 border transition cursor-pointer flex items-center justify-between ${
+                              isChecked
+                                ? 'bg-[#FBF9F5] border-[#1C1D21] shadow-xs'
+                                : 'bg-white border-[#E8E2D8] hover:border-[#1C1D21] opacity-75'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 overflow-hidden">
+                              <span
+                                className={`w-5 h-5 rounded flex items-center justify-center font-mono text-[10px] shrink-0 border ${
+                                  isChecked
+                                    ? 'bg-[#1A2B4C] text-white border-[#1C1D21] font-bold'
+                                    : 'bg-[#F4EFEA] text-[#8E929E] border-[#DCD6CD]'
+                                }`}
+                              >
+                                {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                              </span>
+                              <span
+                                className={`text-xs font-medium truncate ${
+                                  isChecked ? 'text-[#1C1D21] font-bold' : 'text-[#575A65]'
+                                }`}
+                                title={chap}
+                              >
+                                {chap}
+                              </span>
+                            </div>
+
+                            <div className="shrink-0 ml-2">
+                              {isChecked ? (
+                                <CheckSquare className="w-4 h-4 text-[#236B47]" />
+                              ) : (
+                                <Square className="w-4 h-4 text-[#DCD6CD]" />
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
               </div>
 
-              {/* Difficulty Selector */}
+              {/* 3. Difficulty Selector */}
               <div>
                 <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[#1C1D21] mb-2">
-                  4. Challenge Tier
+                  3. Challenge Tier
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {(['EASY', 'MEDIUM', 'HARD'] as const).map((diff) => (
@@ -550,6 +779,12 @@ export const PracticeWizardPage: React.FC = () => {
             </div>
           )}
 
+          {error && (
+            <div className="p-3 bg-[#FDF0F0] border border-[#A83232] text-[#A83232] font-mono text-xs">
+              {error}
+            </div>
+          )}
+
           {/* Launch Action */}
           <div className="flex justify-between items-center pt-6 border-t border-[#DCD6CD]">
             <button
@@ -560,18 +795,20 @@ export const PracticeWizardPage: React.FC = () => {
             </button>
             <button
               onClick={handleLaunch}
-              disabled={isLaunching || isLoadingTaxonomy}
+              disabled={isLaunching || isLoadingTaxonomy || totalSelectedChapters === 0}
               className="px-8 py-3.5 bg-[#236B47] hover:bg-[#1C5538] text-white font-mono text-xs uppercase tracking-wider font-bold btn-tactile flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isLaunching ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Synthesizing Session &amp; Buffer...</span>
+                  <span>Synthesizing Exam &amp; Generating Questions...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-[#FBF9F5]" />
-                  <span>Launch Practice Arena ➔</span>
+                  <span>
+                    Launch Practice Arena ({totalSelectedChapters} Ch) ➔
+                  </span>
                 </>
               )}
             </button>

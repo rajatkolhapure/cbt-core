@@ -3,17 +3,22 @@ import { AppError } from '../middleware/error.middleware';
 import { Difficulty, PracticeMode, SessionDurationType } from '@prisma/client';
 import aiGeneratorService from './ai-generator.service';
 
+export interface SelectedTopicsInput {
+  subject?: string;
+  chapter?: string;
+  subtopic?: string;
+  subjects?: string[];
+  chapters?: Record<string, string[]>;
+  isFullSyllabus?: boolean;
+  difficulty: Difficulty;
+}
+
 export interface CreateSessionInput {
   mode: PracticeMode;
   durationType: SessionDurationType;
   targetDuration?: number; // In minutes
   targetCount?: number;    // Number of questions
-  selectedTopics: {
-    subject: string;
-    chapter: string;
-    subtopic?: string;
-    difficulty: Difficulty;
-  };
+  selectedTopics: SelectedTopicsInput;
 }
 
 export interface SubmitAnswerInput {
@@ -32,29 +37,88 @@ export class AiPracticeService {
   async createSession(userId: string, data: CreateSessionInput) {
     const { mode, durationType, targetDuration, targetCount, selectedTopics } = data;
 
+    const subjects =
+      selectedTopics.subjects && selectedTopics.subjects.length > 0
+        ? selectedTopics.subjects
+        : selectedTopics.subject
+        ? [selectedTopics.subject]
+        : ['Physics', 'Chemistry', 'Mathematics'];
+
+    const chaptersMap = selectedTopics.chapters || {};
+    const difficulty = selectedTopics.difficulty || Difficulty.MEDIUM;
+
+    let initialQuestions: any[] = [];
+    const sections: Array<{ id: string; name: string; order: number; questionCount: number; questions: any[] }> = [];
+
+    if (mode === PracticeMode.TEST) {
+      // In TEST mode: questions are organized into sections matching selected subjects
+      const totalTestQuestions = targetCount || (subjects.length * 10);
+      const perSubjectCount = Math.max(1, Math.round(totalTestQuestions / subjects.length));
+
+      let globalOrder = 1;
+      for (let sIdx = 0; sIdx < subjects.length; sIdx++) {
+        const subj = subjects[sIdx];
+        const subjectQuestions = await aiGeneratorService.getOrGenerateQuestionsMulti(
+          [subj],
+          chaptersMap,
+          difficulty,
+          perSubjectCount
+        );
+
+        const sectionQList = subjectQuestions.map((q, qIdx) => ({
+          id: q.id || `test-q-${sIdx}-${qIdx}`,
+          order: globalOrder++,
+          question: {
+            id: q.id || `test-q-${sIdx}-${qIdx}`,
+            text: q.text,
+            type: q.type,
+            subject: subj,
+            chapter: q.chapter,
+            subtopic: q.subtopic,
+            difficulty: q.difficulty,
+            marks: 4,
+            negativeMarks: 1,
+            options: q.options,
+            correctOption: q.correctOption,
+            solutionText: q.solutionText,
+          },
+        }));
+
+        sections.push({
+          id: `section-${sIdx + 1}`,
+          name: subj,
+          order: sIdx + 1,
+          questionCount: sectionQList.length,
+          questions: sectionQList,
+        });
+
+        initialQuestions.push(...subjectQuestions);
+      }
+    } else {
+      // ARCADE mode: initial batch of 5 questions
+      initialQuestions = await aiGeneratorService.getOrGenerateQuestionsMulti(
+        subjects,
+        chaptersMap,
+        difficulty,
+        5
+      );
+    }
+
     const session = await prisma.aiPracticeSession.create({
       data: {
         userId,
         mode,
         durationType,
         targetDuration: durationType === SessionDurationType.TIMED ? targetDuration || 15 : null,
-        targetCount: durationType === SessionDurationType.QUESTION_COUNT ? targetCount || 20 : null,
+        targetCount: durationType === SessionDurationType.QUESTION_COUNT ? targetCount || initialQuestions.length : null,
         selectedTopics: selectedTopics as any,
       },
     });
 
-    // Generate/fetch initial batch of 5 questions
-    const initialQuestions = await aiGeneratorService.getOrGenerateQuestions(
-      selectedTopics.subject,
-      selectedTopics.chapter,
-      selectedTopics.subtopic || '',
-      selectedTopics.difficulty || Difficulty.MEDIUM,
-      5
-    );
-
     return {
       session,
       initialQuestions,
+      sections,
     };
   }
 
@@ -74,7 +138,7 @@ export class AiPracticeService {
   }
 
   /**
-   * Pre-fetches the next batch of 5 questions for zero-latency buffer
+   * Pre-fetches the next batch of questions for zero-latency buffer
    */
   async getNextBatch(sessionId: string, userId: string, count: number = 5) {
     const session = await prisma.aiPracticeSession.findFirst({
@@ -89,18 +153,20 @@ export class AiPracticeService {
       return [];
     }
 
-    const topics = session.selectedTopics as {
-      subject: string;
-      chapter: string;
-      subtopic?: string;
-      difficulty: Difficulty;
-    };
+    const topics = (session.selectedTopics as unknown) as SelectedTopicsInput;
+    const subjects =
+      topics.subjects && topics.subjects.length > 0
+        ? topics.subjects
+        : topics.subject
+        ? [topics.subject]
+        : ['Physics', 'Chemistry', 'Mathematics'];
+    const chaptersMap = topics.chapters || {};
+    const difficulty = topics.difficulty || Difficulty.MEDIUM;
 
-    const nextBatch = await aiGeneratorService.getOrGenerateQuestions(
-      topics.subject,
-      topics.chapter,
-      topics.subtopic || '',
-      topics.difficulty || Difficulty.MEDIUM,
+    const nextBatch = await aiGeneratorService.getOrGenerateQuestionsMulti(
+      subjects,
+      chaptersMap,
+      difficulty,
       count
     );
 
