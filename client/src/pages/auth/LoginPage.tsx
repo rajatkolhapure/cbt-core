@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ShieldCheck, LogIn, AlertCircle, Terminal, Cpu } from 'lucide-react';
+import { FoxCadetMascot } from '../../components/auth/FoxCadetMascot';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tickerStep, setTickerStep] = useState(0);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -55,98 +57,167 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF9F5] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans selection:bg-[#1A2B4C] selection:text-[#FBF9F5]">
-      {/* Top Academic Masthead */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#1A2B4C] text-[#FBF9F5] border border-[#1C1D21] shadow-tactile mb-4">
-          <ShieldCheck className="w-6 h-6 text-[#C88A2D]" />
+    <div className="min-h-screen bg-[#0B0F17] text-stone-100 flex flex-col lg:flex-row font-sans selection:bg-[#C85A32] selection:text-white relative overflow-x-hidden">
+      
+      {/* ========================================================= */}
+      {/* LEFT 60% STAGE: Fox Cadet Mascot Stage (Desktop >= 1024px) */}
+      {/* ========================================================= */}
+      <section 
+        aria-label="Cadet Mascot Stage"
+        className="hidden lg:flex lg:w-[60%] relative flex-col items-center justify-center p-8 lg:p-12 border-r border-stone-800/80 bg-[#0B0F17] overflow-hidden select-none"
+      >
+        {/* Soft Radial Ambient Lighting Behind Mascot */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,_#1C2A44_0%,_#0B0F17_70%)] opacity-60 pointer-events-none" />
+
+        {/* Ambient Orbit Grid / Subtle Depth Markers */}
+        <div className="absolute w-[440px] h-[440px] rounded-full border border-stone-800/40 pointer-events-none -translate-y-6" />
+        <div className="absolute w-[600px] h-[600px] rounded-full border border-stone-800/20 pointer-events-none -translate-y-6" />
+
+        {/* Centered Interactive Fox Cadet Vector Mascot */}
+        <div className="relative z-10 flex flex-col items-center max-w-sm w-full">
+          <FoxCadetMascot
+            isPasswordFocused={isPasswordFocused}
+            className="w-72 xl:w-80 h-auto"
+          />
+
+          {/* Understated Typographic Badge */}
+          <div className="mt-8 text-center space-y-1.5">
+            <p className="font-mono text-xs uppercase tracking-widest text-stone-300">
+              Cadet Flight Log · Ready when you are.
+            </p>
+            <p className="text-[11px] font-mono text-stone-500 tracking-wider">
+              CBT EVALUATION SYSTEM · CADET CONSOLE GATEWAY
+            </p>
+          </div>
         </div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1D21]">
-          Examination Portal
-        </h1>
-        <p className="mt-1 font-mono text-xs uppercase tracking-widest text-[#575A65]">
-          Computer-Based Testing & Proctoring Engine
-        </p>
-      </div>
+      </section>
 
-      {/* Main Terminal Card */}
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white border border-[#1C1D21] shadow-tactile-lg p-6 sm:p-8">
-          {error && (
-            <div className="mb-5 bg-[#FDF0F0] border border-[#A83232] text-[#A83232] px-4 py-3 text-xs flex items-start gap-2.5 shadow-xs">
-              <AlertCircle className="w-4 h-4 text-[#A83232] shrink-0 mt-0.5" />
-              <span className="font-medium leading-relaxed">{error}</span>
+      {/* ========================================================= */}
+      {/* RIGHT 40% STAGE: Minimalist Dark Auth Card                 */}
+      {/* ========================================================= */}
+      <section 
+        aria-label="Authentication Form"
+        className="w-full lg:w-[40%] min-h-screen flex flex-col justify-center items-center px-4 py-8 sm:px-8 lg:px-12 z-10 bg-[#0D121C]"
+      >
+        {/* Mobile Header Mascot Badge (< 1024px) */}
+        <div className="lg:hidden flex flex-col items-center justify-center pt-2 pb-6">
+          <div className="w-20 h-20 rounded-full bg-[#151D2C] border-2 border-stone-700/80 shadow-lg p-1.5 flex items-center justify-center overflow-hidden mb-3">
+            <FoxCadetMascot
+              isPasswordFocused={isPasswordFocused}
+              className="w-16 h-16"
+            />
+          </div>
+          <h1 className="font-serif text-2xl font-bold tracking-tight text-white text-center">
+            Examination Portal
+          </h1>
+          <p className="font-mono text-[11px] uppercase tracking-widest text-stone-400 text-center mt-0.5">
+            Cadet Console Gateway
+          </p>
+        </div>
+
+        {/* Auth Card Container */}
+        <div className="w-full max-w-md space-y-6">
+          
+          {/* Desktop Card Header (≥ 1024px) */}
+          <div className="hidden lg:block space-y-2 text-left">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#151E2E] border border-stone-800 text-[10px] font-mono text-[#E2B150] uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#C88A2D]" />
+              <span>Restricted Cadet Terminal</span>
             </div>
-          )}
+            <h1 className="font-serif text-3xl font-bold tracking-tight text-white">
+              Examination Portal
+            </h1>
+            <p className="font-mono text-xs text-stone-400 tracking-wide">
+              Enter your credentials to access proctored test papers.
+            </p>
+          </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1">
-                Candidate / Admin Email
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="candidate@cbt.com"
-                className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
-              />
-            </div>
+          {/* Card Body */}
+          <div className="bg-[#121722] border border-stone-800 shadow-2xl p-6 sm:p-8">
+            
+            {/* Error Feedback Banner */}
+            {error && (
+              <div className="mb-5 bg-[#2B1417] border border-[#852C2C] text-[#FCA5A5] px-4 py-3 text-xs flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-[#F87171] shrink-0 mt-0.5" />
+                <span className="font-medium leading-relaxed">{error}</span>
+              </div>
+            )}
 
-            <div>
-              <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1">
-                Access Key / Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
-              />
-            </div>
+            {/* Login Form */}
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                  Candidate / Admin Email
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="candidate@cbt.com"
+                  className="w-full px-3.5 py-2.5 bg-[#0B0F17] border border-stone-700/80 text-xs sm:text-sm font-sans text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-[#C88A2D] focus:ring-1 focus:ring-[#C88A2D] transition-all"
+                />
+              </div>
 
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3 px-4 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] font-mono text-xs uppercase tracking-wider font-bold btn-tactile flex items-center justify-center gap-2"
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                  Access Key / Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
+                  placeholder="••••••••"
+                  className="w-full px-3.5 py-2.5 bg-[#0B0F17] border border-stone-700/80 text-xs sm:text-sm font-sans text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-[#C88A2D] focus:ring-1 focus:ring-[#C88A2D] transition-all"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 px-4 bg-[#C85A32] hover:bg-[#B34E2A] text-white font-mono text-xs uppercase tracking-wider font-bold shadow-md active:translate-y-[1px] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin" />
+                      <span>Verifying Environment...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <LogIn className="w-4 h-4 text-[#F7F3EB]" />
+                      <span>Authenticate &amp; Access Console</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Student Registration Link */}
+            <div className="mt-6 text-center">
+              <Link
+                to="/register"
+                className="font-mono text-xs text-stone-300 hover:text-[#E2B150] font-medium transition-colors inline-flex items-center gap-1.5"
               >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-3.5 h-3.5 border-2 border-[#FBF9F5] border-t-transparent animate-spin" />
-                    <span>Verifying Environment...</span>
-                  </div>
-                ) : (
-                  <>
-                    <LogIn className="w-4 h-4 text-[#C88A2D]" />
-                    <span>Authenticate & Access Console</span>
-                  </>
-                )}
-              </button>
+                <span>New cadet? Register here</span>
+                <span className="text-[#C88A2D]">→</span>
+              </Link>
             </div>
-          </form>
 
-          {/* Student Registration Link */}
-          <div className="mt-5 text-center">
-            <Link
-              to="/register"
-              className="font-mono text-xs text-[#1A2B4C] hover:text-[#C88A2D] font-bold hover:underline inline-flex items-center gap-1 transition"
-            >
-              <span>New student? Verify &amp; Register here</span>
-              <span>→</span>
-            </Link>
-          </div>
-
-          {/* Micro Footer */}
-          <div className="mt-5 pt-4 border-t border-[#DCD6CD] flex items-center justify-between text-[10px] font-mono text-[#575A65]">
-            <span>STATUS: READY</span>
-            <span>RESTRICTED ACCESS</span>
+            {/* Micro Card Footer */}
+            <div className="mt-6 pt-4 border-t border-stone-800 flex items-center justify-between text-[10px] font-mono text-stone-500">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                STATUS: READY
+              </span>
+              <span>RESTRICTED ACCESS</span>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Retro Telemetry Loading Screen Overlay */}
       {isSubmitting && (
