@@ -75,7 +75,7 @@ export class IntegrityService {
       prisma.integrityEvent.findMany({
         where,
         include: {
-          user: { select: { id: true, name: true, email: true, candidateId: true } },
+          user: { select: { id: true, name: true, email: true } },
           attempt: {
             select: {
               id: true,

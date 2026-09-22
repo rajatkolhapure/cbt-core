@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../api/client';
-import { AlertCircle, ArrowRight, ArrowLeft, Mail, Key, User, Hash, ShieldCheck, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ArrowRight, ArrowLeft, Mail, Key, User, ShieldCheck, RotateCcw, CheckCircle2 } from 'lucide-react';
 import { FoxCadetMascot } from '../../components/auth/FoxCadetMascot';
 
 export const RegisterPage: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [candidateId, setCandidateId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -122,7 +121,6 @@ export const RegisterPage: React.FC = () => {
     const newDigits = [...otpDigits];
 
     if (cleanValue.length > 1) {
-      // Handle paste of full 6 digits
       const pastedChars = cleanValue.slice(0, 6).split('');
       pastedChars.forEach((char, i) => {
         if (i < 6) newDigits[i] = char;
@@ -136,7 +134,6 @@ export const RegisterPage: React.FC = () => {
     newDigits[index] = cleanValue;
     setOtpDigits(newDigits);
 
-    // Auto focus next box
     if (cleanValue && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
@@ -179,7 +176,6 @@ export const RegisterPage: React.FC = () => {
         code: fullCode,
         name: name.trim(),
         password,
-        candidateId: candidateId.trim() || undefined,
       });
 
       setIsSuccess(true);
@@ -196,9 +192,9 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
-  // Shared input class
+  // Compact input class — py-2.5 for viewport optimization
   const inputClass =
-    'w-full pl-10 pr-4 py-3 bg-[#121826] border border-slate-800/80 rounded-lg text-sm text-[#F3F4F6] placeholder:text-slate-500 focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32]/40 focus:outline-none transition-all';
+    'w-full pl-10 pr-4 py-2.5 bg-[#121826] border border-slate-800/80 rounded-lg text-sm text-[#F3F4F6] placeholder:text-slate-500 focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32]/40 focus:outline-none transition-all';
 
   return (
     <div
@@ -252,10 +248,10 @@ export const RegisterPage: React.FC = () => {
       {/* ========================================================= */}
       <section
         aria-label="Enlistment Terminal"
-        className="w-full lg:w-[42%] xl:w-[40%] min-h-screen flex flex-col justify-center items-center px-6 py-12 sm:px-10 lg:px-14 z-10"
+        className="w-full lg:w-[42%] xl:w-[40%] min-h-screen flex flex-col justify-center items-center px-6 py-8 sm:px-10 lg:px-12 z-10"
       >
         {/* Mobile Mascot (< 1024px) — full vector, no clipping */}
-        <div className="lg:hidden flex justify-center mb-6">
+        <div className="lg:hidden flex justify-center mb-4">
           <FoxCadetMascot
             isPasswordFocused={isPasswordFocused}
             isError={Boolean(error)}
@@ -266,7 +262,7 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         {/* Borderless Floating Form Container */}
-        <div className="relative w-full max-w-md space-y-6">
+        <div className="relative w-full max-w-md space-y-4">
 
           {/* Subtle Corner Tick Marks */}
           <span className="hidden sm:block absolute -top-4 -left-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
@@ -275,7 +271,7 @@ export const RegisterPage: React.FC = () => {
           <span className="hidden sm:block absolute -bottom-4 -right-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
 
           {/* Centered Editorial Header */}
-          <div className="flex flex-col items-center text-center mx-auto space-y-1.5">
+          <div className="flex flex-col items-center text-center mx-auto space-y-1">
             <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-[#D4A373] uppercase select-none">
               // CADET ENLISTMENT GATE
             </span>
@@ -288,7 +284,7 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           {/* 2-Step Progress Indicator */}
-          <div className="flex items-center justify-center gap-3 pt-1">
+          <div className="flex items-center justify-center gap-3">
             {/* Step 1 */}
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full transition-colors ${
@@ -319,7 +315,7 @@ export const RegisterPage: React.FC = () => {
 
           {/* Error Feedback Banner */}
           {error && (
-            <div className="bg-[#261316] text-[#FCA5A5] px-4 py-3 text-xs rounded-lg flex items-start gap-2.5 border border-red-950">
+            <div className="bg-[#261316] text-[#FCA5A5] px-4 py-2.5 text-xs rounded-lg flex items-start gap-2.5 border border-red-950">
               <AlertCircle className="w-4 h-4 text-[#F87171] shrink-0 mt-0.5" />
               <span className="font-medium leading-relaxed">{error}</span>
             </div>
@@ -327,7 +323,7 @@ export const RegisterPage: React.FC = () => {
 
           {/* Success Feedback Banner */}
           {successMessage && !error && (
-            <div className="bg-[#0F1F17] text-emerald-300 px-4 py-3 text-xs rounded-lg flex items-start gap-2.5 border border-emerald-900/60">
+            <div className="bg-[#0F1F17] text-emerald-300 px-4 py-2.5 text-xs rounded-lg flex items-start gap-2.5 border border-emerald-900/60">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <span className="font-medium leading-relaxed">{successMessage}</span>
             </div>
@@ -337,10 +333,10 @@ export const RegisterPage: React.FC = () => {
           {/* STEP 1: Credentials Form               */}
           {/* ====================================== */}
           {step === 1 && (
-            <form className="space-y-4" onSubmit={handleSendOtp}>
+            <form className="space-y-3.5" onSubmit={handleSendOtp}>
               {/* Full Candidate Name */}
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-[#8A99AD] mb-2 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" />
                   Full Candidate Name
                 </label>
@@ -359,7 +355,7 @@ export const RegisterPage: React.FC = () => {
 
               {/* Email Address */}
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-[#8A99AD] mb-2 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5" />
                   Email Address
                 </label>
@@ -376,28 +372,9 @@ export const RegisterPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Roll Number / Candidate ID (Optional) */}
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-[#8A99AD] mb-2 flex items-center gap-1.5">
-                  <Hash className="w-3.5 h-3.5" />
-                  Roll Number / Candidate ID
-                  <span className="text-slate-600 font-normal normal-case text-[10px]">(optional)</span>
-                </label>
-                <div className="relative">
-                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
-                  <input
-                    type="text"
-                    value={candidateId}
-                    onChange={(e) => setCandidateId(e.target.value)}
-                    placeholder="e.g. CET-2026-0005"
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
               {/* Access Key / Password */}
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-[#8A99AD] mb-2 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
                   <Key className="w-3.5 h-3.5" />
                   Access Key / Password
                 </label>
@@ -418,7 +395,7 @@ export const RegisterPage: React.FC = () => {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-[#8A99AD] mb-2 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Confirm Access Key
                 </label>
@@ -438,11 +415,11 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               {/* CTA Button */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   type="submit"
                   disabled={isSendingOtp}
-                  className={`w-full py-3.5 px-5 bg-[#C85A32] hover:bg-[#B54E29] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 ${
+                  className={`w-full py-3 px-5 bg-[#C85A32] hover:bg-[#B54E29] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 ${
                     isSendingOtp ? 'opacity-80 cursor-wait' : 'cursor-pointer'
                   }`}
                 >
@@ -467,7 +444,7 @@ export const RegisterPage: React.FC = () => {
           {/* STEP 2: OTP Verification Terminal      */}
           {/* ====================================== */}
           {step === 2 && (
-            <form className="space-y-5" onSubmit={handleVerifyOtp}>
+            <form className="space-y-4" onSubmit={handleVerifyOtp}>
               <div className="text-center space-y-1">
                 <p className="text-xs text-[#8A99AD] font-mono">
                   Enter the 6-digit transmission code dispatched to:
@@ -478,7 +455,7 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               {/* 6-Digit Input Grid */}
-              <div className="flex justify-center items-center gap-2 sm:gap-3 my-4">
+              <div className="flex justify-center items-center gap-2 sm:gap-3 my-3">
                 {otpDigits.map((digit, idx) => (
                   <input
                     key={idx}
@@ -520,7 +497,7 @@ export const RegisterPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isVerifying || otpDigits.join('').length !== 6}
-                  className={`w-full py-3.5 px-5 bg-[#C85A32] hover:bg-[#B54E29] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 disabled:opacity-40 ${
+                  className={`w-full py-3 px-5 bg-[#C85A32] hover:bg-[#B54E29] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 disabled:opacity-40 ${
                     isVerifying ? 'opacity-80 cursor-wait' : 'cursor-pointer'
                   }`}
                 >
@@ -545,7 +522,7 @@ export const RegisterPage: React.FC = () => {
                     setError(null);
                     setSuccessMessage(null);
                   }}
-                  className="w-full text-center font-mono text-xs text-slate-400 hover:text-[#D4A373] flex items-center justify-center gap-1.5 transition-colors py-2"
+                  className="w-full text-center font-mono text-xs text-slate-400 hover:text-[#D4A373] flex items-center justify-center gap-1.5 transition-colors py-1.5"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>← Back to Credentials</span>
@@ -555,7 +532,7 @@ export const RegisterPage: React.FC = () => {
           )}
 
           {/* Terminal Footer */}
-          <div className="pt-2 text-center">
+          <div className="pt-1 text-center">
             <Link
               to="/login"
               className="text-xs text-stone-400 hover:text-[#D4A373] font-medium transition-colors inline-flex items-center gap-1.5"

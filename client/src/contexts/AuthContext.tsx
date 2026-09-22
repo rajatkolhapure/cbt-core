@@ -8,8 +8,8 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
-  register: (name: string, email: string, password: string, candidateId?: string) => Promise<User>;
-  verifyOtpAndLogin: (data: { email: string; code: string; name: string; password: string; candidateId?: string }) => Promise<User>;
+  register: (name: string, email: string, password: string) => Promise<User>;
+  verifyOtpAndLogin: (data: { email: string; code: string; name: string; password: string }) => Promise<User>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 }
@@ -65,8 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user;
   };
 
-  const register = async (name: string, email: string, password: string, candidateId?: string) => {
-    const res = await api.post('/auth/register', { name, email, password, candidateId });
+  const register = async (name: string, email: string, password: string) => {
+    const res = await api.post('/auth/register', { name, email, password });
     const { user, token } = res.data;
     setUser(user);
     setToken(token);
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user;
   };
 
-  const verifyOtpAndLogin = async (data: { email: string; code: string; name: string; password: string; candidateId?: string }) => {
+  const verifyOtpAndLogin = async (data: { email: string; code: string; name: string; password: string }) => {
     const res = await api.post('/auth/verify-otp', data);
     const { user, token } = res.data;
     setUser(user);

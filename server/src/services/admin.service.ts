@@ -27,7 +27,7 @@ export class AdminService {
         take: 5,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { id: true, name: true, email: true, candidateId: true } },
+          user: { select: { id: true, name: true, email: true } },
           exam: { select: { id: true, title: true, totalMarks: true } },
         },
       }),
@@ -35,7 +35,7 @@ export class AdminService {
         take: 10,
         orderBy: { timestamp: 'desc' },
         include: {
-          user: { select: { id: true, name: true, candidateId: true } },
+          user: { select: { id: true, name: true } },
           attempt: {
             select: {
               id: true,
@@ -84,7 +84,6 @@ export class AdminService {
       where.OR = [
         { name: { contains: filters.search, mode: 'insensitive' } },
         { email: { contains: filters.search, mode: 'insensitive' } },
-        { candidateId: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
 
@@ -96,7 +95,6 @@ export class AdminService {
           id: true,
           email: true,
           name: true,
-          candidateId: true,
           isActive: true,
           createdAt: true,
           _count: {
@@ -132,15 +130,6 @@ export class AdminService {
       throw new AppError(409, 'Email already registered');
     }
 
-    if (data.candidateId) {
-      const existingCandidate = await prisma.user.findUnique({
-        where: { candidateId: data.candidateId },
-      });
-      if (existingCandidate) {
-        throw new AppError(409, 'Candidate ID already in use');
-      }
-    }
-
     const hashedPassword = await bcrypt.hash(
       data.password,
       AUTH_CONFIG.bcryptRounds
@@ -151,7 +140,6 @@ export class AdminService {
         email: data.email,
         password: hashedPassword,
         name: data.name,
-        candidateId: data.candidateId,
         role: 'STUDENT',
       },
       select: {
@@ -159,7 +147,6 @@ export class AdminService {
         email: true,
         name: true,
         role: true,
-        candidateId: true,
         isActive: true,
         createdAt: true,
       },
@@ -193,7 +180,6 @@ export class AdminService {
           data: {
             email: student.email,
             name: student.name,
-            candidateId: student.candidateId || null,
             password: hashedPassword,
             role: 'STUDENT',
           },
@@ -218,7 +204,6 @@ export class AdminService {
         id: true,
         email: true,
         name: true,
-        candidateId: true,
         isActive: true,
         createdAt: true,
         examAssignments: {
@@ -265,7 +250,6 @@ export class AdminService {
             id: true,
             name: true,
             email: true,
-            candidateId: true,
             hardwareProfiles: {
               take: 1,
               orderBy: { createdAt: 'desc' },
@@ -414,7 +398,6 @@ export class AdminService {
             id: true,
             name: true,
             email: true,
-            candidateId: true,
             hardwareProfiles: {
               take: 1,
               orderBy: { createdAt: 'desc' },

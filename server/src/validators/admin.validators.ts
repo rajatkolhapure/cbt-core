@@ -4,7 +4,6 @@ export const createStudentSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   name: z.string().min(1, 'Name is required').max(100),
-  candidateId: z.string().optional(),
 });
 
 export const bulkImportStudentsSchema = z.object({
@@ -12,7 +11,6 @@ export const bulkImportStudentsSchema = z.object({
     z.object({
       email: z.string().email('Invalid email address'),
       name: z.string().min(1, 'Name is required'),
-      candidateId: z.string().optional(),
       password: z.string().min(6).optional().default('student123'),
     })
   ).min(1, 'At least one student is required'),

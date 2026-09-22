@@ -121,7 +121,7 @@ export const ExamHeader: React.FC<ExamHeaderProps> = ({
         {/* Candidate Badge */}
         <div className="hidden xl:flex items-center pl-2 border-l border-[#2E323B] text-[11px] font-mono">
           <span className="text-[#C88A2D] font-bold truncate max-w-[110px]">
-            {user?.candidateId || user?.name || 'CANDIDATE'}
+            {user?.name || 'CANDIDATE'}
           </span>
         </div>
       </div>

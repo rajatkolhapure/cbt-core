@@ -36,7 +36,7 @@ export const StudentLayout: React.FC = () => {
               <div className="text-xs font-semibold text-white font-serif">{user?.name}</div>
               <div className="text-[10px] text-[#C88A2D] font-mono flex items-center justify-end gap-1">
                 <UserCheck className="w-3 h-3 text-[#C88A2D]" />
-                <span>ROLL: {user?.candidateId || user?.email}</span>
+                <span>{user?.email}</span>
               </div>
             </div>
             <button

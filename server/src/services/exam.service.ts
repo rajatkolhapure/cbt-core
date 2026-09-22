@@ -99,7 +99,7 @@ export class ExamService {
         assignments: user.role === 'ADMIN' ? {
           include: {
             user: {
-              select: { id: true, name: true, email: true, candidateId: true },
+              select: { id: true, name: true, email: true },
             },
           },
         } : false,
