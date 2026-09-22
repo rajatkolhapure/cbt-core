@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 
 export interface FoxCadetMascotProps {
   isPasswordFocused?: boolean;
@@ -18,6 +18,9 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [pupilOffset, setPupilOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isBlinking, setIsBlinking] = useState(false);
+  // Unique prefix so gradient/clipPath IDs don't collide between
+  // the desktop and mobile instances rendered on the same page.
+  const uid = useId().replace(/:/g, '');
 
   // Periodic eye blinking (every 4-6s)
   useEffect(() => {
@@ -114,35 +117,35 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
       >
         <defs>
           {/* Muted Terracotta Fur Gradient */}
-          <linearGradient id="chibiFur" x1="160" y1="70" x2="160" y2="230" gradientUnits="userSpaceOnUse">
+          <linearGradient id={`${uid}chibiFur`} x1="160" y1="70" x2="160" y2="230" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stopColor="#D96338" />
             <stop offset="100%" stopColor="#B64B22" />
           </linearGradient>
 
           {/* Helmet Dome Specular Sheen */}
-          <linearGradient id="glassDomeSheen" x1="90" y1="40" x2="230" y2="260" gradientUnits="userSpaceOnUse">
+          <linearGradient id={`${uid}glassDomeSheen`} x1="90" y1="40" x2="230" y2="260" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.22" />
             <stop offset="40%" stopColor="#E2B150" stopOpacity="0.08" />
             <stop offset="100%" stopColor="#0B0F17" stopOpacity="0.2" />
           </linearGradient>
 
           {/* Polarized Visor Tint for "No Peeking" */}
-          <linearGradient id="polarizedVisorTint" x1="160" y1="50" x2="160" y2="250" gradientUnits="userSpaceOnUse">
+          <linearGradient id={`${uid}polarizedVisorTint`} x1="160" y1="50" x2="160" y2="250" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stopColor="#0B132B" stopOpacity="0.96" />
             <stop offset="60%" stopColor="#1C2541" stopOpacity="0.94" />
             <stop offset="100%" stopColor="#3A506B" stopOpacity="0.9" />
           </linearGradient>
 
           {/* Eye Socket Clips */}
-          <clipPath id="chibiLeftEyeClip">
+          <clipPath id={`${uid}chibiLeftEyeClip`}>
             <ellipse cx="124" cy="148" rx="12" ry="14" />
           </clipPath>
-          <clipPath id="chibiRightEyeClip">
+          <clipPath id={`${uid}chibiRightEyeClip`}>
             <ellipse cx="196" cy="148" rx="12" ry="14" />
           </clipPath>
 
           {/* Helmet Glass Clip */}
-          <clipPath id="chibiHelmetClip">
+          <clipPath id={`${uid}chibiHelmetClip`}>
             <circle cx="160" cy="150" r="102" />
           </clipPath>
         </defs>
@@ -237,7 +240,7 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
               {/* Outer Ear Body */}
               <path
                 d="M 98 116 L 62 42 C 86 46 114 66 126 102 Z"
-                fill="url(#chibiFur)"
+                fill={`url(#${uid}chibiFur)`}
                 stroke="#141824"
                 strokeWidth="2.5"
                 strokeLinejoin="round"
@@ -274,7 +277,7 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
               {/* Outer Ear Body */}
               <path
                 d="M 222 116 L 258 42 C 234 46 206 66 194 102 Z"
-                fill="url(#chibiFur)"
+                fill={`url(#${uid}chibiFur)`}
                 stroke="#141824"
                 strokeWidth="2.5"
                 strokeLinejoin="round"
@@ -302,7 +305,7 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
             {/* Expressive Crown & Cheeks */}
             <path
               d="M 106 102 C 106 102 128 88 160 88 C 192 88 214 102 214 102 C 236 120 248 150 248 172 C 248 202 216 220 160 220 C 104 220 72 202 72 172 C 72 150 84 120 106 102 Z"
-              fill="url(#chibiFur)"
+              fill={`url(#${uid}chibiFur)`}
               stroke="#141824"
               strokeWidth="2.5"
               strokeLinejoin="round"
@@ -412,7 +415,7 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
             ) : (
               <g id="animeEyes">
                 {/* Left Eye */}
-                <g clipPath="url(#chibiLeftEyeClip)">
+                <g clipPath={`url(#${uid}chibiLeftEyeClip)`}>
                   <ellipse cx="124" cy="148" rx="12" ry="14" fill="#FFFFFF" stroke="#141824" strokeWidth="2.5" />
                   {/* Left Pupil with dual specular highlights */}
                   <g
@@ -432,7 +435,7 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
                 </g>
 
                 {/* Right Eye */}
-                <g clipPath="url(#chibiRightEyeClip)">
+                <g clipPath={`url(#${uid}chibiRightEyeClip)`}>
                   <ellipse cx="196" cy="148" rx="12" ry="14" fill="#FFFFFF" stroke="#141824" strokeWidth="2.5" />
                   {/* Right Pupil with dual specular highlights */}
                   <g
@@ -462,9 +465,9 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
                     transition: 'opacity 60ms ease-out',
                   }}
                 >
-                  <ellipse cx="124" cy="148" rx="12.5" ry="14.5" fill="url(#chibiFur)" />
+                  <ellipse cx="124" cy="148" rx="12.5" ry="14.5" fill={`url(#${uid}chibiFur)`} />
                   <path d="M 112 149 Q 124 154 136 149" stroke="#141824" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                  <ellipse cx="196" cy="148" rx="12.5" ry="14.5" fill="url(#chibiFur)" />
+                  <ellipse cx="196" cy="148" rx="12.5" ry="14.5" fill={`url(#${uid}chibiFur)`} />
                   <path d="M 184 149 Q 196 154 208 149" stroke="#141824" strokeWidth="2.5" strokeLinecap="round" fill="none" />
                 </g>
               </g>
@@ -480,7 +483,7 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
               cx="160"
               cy="150"
               r="102"
-              fill="url(#glassDomeSheen)"
+              fill={`url(#${uid}glassDomeSheen)`}
               stroke="#141824"
               strokeWidth="2.8"
             />
@@ -512,13 +515,13 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
             />
 
             {/* Polarized Visor Shield Slide-Down (Password Focus "No Peeking") */}
-            <g clipPath="url(#chibiHelmetClip)">
+            <g clipPath={`url(#${uid}chibiHelmetClip)`}>
               <rect
                 x="50"
                 y="40"
                 width="220"
                 height="220"
-                fill="url(#polarizedVisorTint)"
+                fill={`url(#${uid}polarizedVisorTint)`}
                 style={{
                   opacity: isPasswordFocused ? 0.92 : 0,
                   transform: isPasswordFocused ? 'translateY(0px)' : 'translateY(-150px)',
