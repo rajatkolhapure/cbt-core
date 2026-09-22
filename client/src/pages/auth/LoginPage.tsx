@@ -104,17 +104,15 @@ export const LoginPage: React.FC = () => {
         aria-label="Launch Station Form"
         className="w-full lg:w-[42%] xl:w-[40%] min-h-screen flex flex-col justify-center items-center px-6 py-12 sm:px-10 lg:px-14 z-10"
       >
-        {/* Mobile Mascot Badge (< 1024px) */}
-        <div className="lg:hidden flex flex-col items-center justify-center mb-6">
-          <div className="w-20 h-20 rounded-full bg-[#121826] border border-stone-700/60 shadow-xl p-1.5 flex items-center justify-center overflow-hidden mb-2">
-            <FoxCadetMascot
-              isPasswordFocused={isPasswordFocused}
-              isError={Boolean(error)}
-              isSuccess={isSuccess}
-              mousePosition={mousePosition}
-              className="w-16 h-16"
-            />
-          </div>
+        {/* Mobile Mascot (< 1024px) — full vector, no clipping */}
+        <div className="lg:hidden flex justify-center mb-6">
+          <FoxCadetMascot
+            isPasswordFocused={isPasswordFocused}
+            isError={Boolean(error)}
+            isSuccess={isSuccess}
+            mousePosition={mousePosition}
+            className="w-32 h-auto overflow-visible"
+          />
         </div>
 
         {/* Borderless Floating Form Container with Editorial Accents */}
