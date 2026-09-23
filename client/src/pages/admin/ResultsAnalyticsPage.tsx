@@ -165,8 +165,8 @@ export const ResultsAnalyticsPage: React.FC = () => {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-gray-200 text-slate-600 uppercase tracking-wider font-semibold text-[11px]">
-                <th className="py-3 px-4">Candidate Roll / ID</th>
                 <th className="py-3 px-4">Candidate Name</th>
+                <th className="py-3 px-4">Email</th>
                 <th className="py-3 px-4">Exam</th>
                 <th className="py-3 px-4 text-center">Marks Obtained</th>
                 <th className="py-3 px-4 text-center">Percentage</th>
@@ -183,10 +183,8 @@ export const ResultsAnalyticsPage: React.FC = () => {
               ) : (
                 attempts.map((att: any) => (
                   <tr key={att.id} className="hover:bg-blue-50/30 transition-colors duration-100">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-800">
-                      {att.user?.candidateId || 'N/A'}
-                    </td>
                     <td className="py-3 px-4 font-semibold text-slate-900">{att.user?.name}</td>
+                    <td className="py-3 px-4 font-mono text-slate-600">{att.user?.email || 'N/A'}</td>
                     <td className="py-3 px-4 text-slate-600">{att.exam?.title}</td>
                     <td className="py-3 px-4 text-center font-mono font-bold text-emerald-700">
                       {att.marksObtained ?? 0} / {att.exam?.totalMarks}

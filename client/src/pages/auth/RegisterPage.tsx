@@ -217,7 +217,7 @@ export const RegisterPage: React.FC = () => {
       {/* ========================================================= */}
       <section
         aria-label="Cadet Mascot Stage"
-        className="hidden lg:flex lg:w-[58%] xl:w-[60%] relative flex-col items-center justify-center p-8 lg:p-12 overflow-hidden select-none"
+        className="hidden lg:flex lg:w-[58%] xl:w-[60%] lg:h-screen lg:max-h-screen relative flex-col items-center justify-center p-8 lg:p-12 overflow-hidden select-none"
       >
         {/* Faint terracotta radial halo */}
         <div className="absolute w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_rgba(200,90,50,0.08)_0%,_transparent_70%)] pointer-events-none" />
@@ -248,7 +248,7 @@ export const RegisterPage: React.FC = () => {
       {/* ========================================================= */}
       <section
         aria-label="Enlistment Terminal"
-        className="w-full lg:w-[42%] xl:w-[40%] min-h-screen flex flex-col justify-center items-center px-6 py-8 sm:px-10 lg:px-12 z-10"
+        className="w-full lg:w-[42%] xl:w-[40%] min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-center items-center px-6 py-6 sm:px-10 lg:px-12 z-10 overflow-y-auto"
       >
         {/* Mobile Mascot (< 1024px) — full vector, no clipping */}
         <div className="lg:hidden flex justify-center mb-4">
@@ -262,7 +262,7 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         {/* Borderless Floating Form Container */}
-        <div className="relative w-full max-w-md space-y-4">
+        <div className="relative w-full max-w-md space-y-3.5">
 
           {/* Subtle Corner Tick Marks */}
           <span className="hidden sm:block absolute -top-4 -left-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
@@ -333,10 +333,10 @@ export const RegisterPage: React.FC = () => {
           {/* STEP 1: Credentials Form               */}
           {/* ====================================== */}
           {step === 1 && (
-            <form className="space-y-3.5" onSubmit={handleSendOtp}>
+            <form className="space-y-3" onSubmit={handleSendOtp}>
               {/* Full Candidate Name */}
               <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" />
                   Full Candidate Name
                 </label>
@@ -355,7 +355,7 @@ export const RegisterPage: React.FC = () => {
 
               {/* Email Address */}
               <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5" />
                   Email Address
                 </label>
@@ -374,7 +374,7 @@ export const RegisterPage: React.FC = () => {
 
               {/* Access Key / Password */}
               <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
                   <Key className="w-3.5 h-3.5" />
                   Access Key / Password
                 </label>
@@ -395,7 +395,7 @@ export const RegisterPage: React.FC = () => {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1.5 flex items-center gap-1.5">
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Confirm Access Key
                 </label>

@@ -21,7 +21,6 @@ export const StudentManagementPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('student123');
-  const [candidateId, setCandidateId] = useState('');
 
   // Bulk import state
   const [bulkText, setBulkText] = useState('');
@@ -57,13 +56,11 @@ export const StudentManagementPage: React.FC = () => {
         name,
         email,
         password,
-        candidateId: candidateId || undefined,
       });
       setIsCreateOpen(false);
       setName('');
       setEmail('');
       setPassword('student123');
-      setCandidateId('');
       fetchStudents();
       alert('Student account created successfully.');
     } catch (err: any) {
@@ -80,7 +77,7 @@ export const StudentManagementPage: React.FC = () => {
       if (trimmed.startsWith('[')) {
         parsedStudents = JSON.parse(trimmed);
       } else {
-        // Parse CSV format: name,email,candidateId,password
+        // Parse CSV format: name,email,password
         const lines = trimmed.split('\n');
         for (const line of lines) {
           const parts = line.split(',').map((p) => p.trim());
@@ -88,8 +85,7 @@ export const StudentManagementPage: React.FC = () => {
             parsedStudents.push({
               name: parts[0],
               email: parts[1],
-              candidateId: parts[2] || undefined,
-              password: parts[3] || 'student123',
+              password: parts[2] || 'student123',
             });
           }
         }
@@ -123,7 +119,7 @@ export const StudentManagementPage: React.FC = () => {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Enrolled Candidates</h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Manage candidate roll numbers, exam assignments, and test history
+            Manage candidates, exam assignments, and test history
           </p>
         </div>
 
@@ -154,7 +150,7 @@ export const StudentManagementPage: React.FC = () => {
         <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-2">
           <input
             type="text"
-            placeholder="Search by candidate name, roll number, or email..."
+            placeholder="Search by candidate name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full text-xs border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-600"
@@ -174,7 +170,6 @@ export const StudentManagementPage: React.FC = () => {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-gray-200 text-slate-600 uppercase tracking-wider font-semibold text-[11px]">
-                <th className="py-3 px-4">Roll / Candidate ID</th>
                 <th className="py-3 px-4">Candidate Name</th>
                 <th className="py-3 px-4">Email</th>
                 <th className="py-3 px-4 text-center">Assigned Exams</th>
@@ -185,22 +180,19 @@ export const StudentManagementPage: React.FC = () => {
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
                     Loading candidates...
                   </td>
                 </tr>
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
                     No candidates found.
                   </td>
                 </tr>
               ) : (
                 students.map((stu) => (
                   <tr key={stu.id} className="hover:bg-blue-50/30 transition-colors duration-100">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-800">
-                      {stu.candidateId || <span className="text-slate-400 font-normal">N/A</span>}
-                    </td>
                     <td className="py-3 px-4 font-semibold text-slate-900">{stu.name}</td>
                     <td className="py-3 px-4 font-mono text-slate-600">{stu.email}</td>
                     <td className="py-3 px-4 text-center">
@@ -244,17 +236,6 @@ export const StudentManagementPage: React.FC = () => {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Ramesh Kumar"
                   className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Roll / Candidate ID</label>
-                <input
-                  type="text"
-                  value={candidateId}
-                  onChange={(e) => setCandidateId(e.target.value)}
-                  placeholder="e.g. 2026-CET-0081"
-                  className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-xs font-mono"
                 />
               </div>
 
@@ -314,14 +295,14 @@ export const StudentManagementPage: React.FC = () => {
 
             <p className="text-slate-600 text-[11px]">
               Paste CSV format (one student per line): <br />
-              <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">Name, Email, RollNumber, Password</code>
+              <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">Name, Email, Password</code>
             </p>
 
             <textarea
               rows={8}
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
-              placeholder="Aarav Sharma, aarav@cbt.com, CAND01, student123&#10;Diya Patel, diya@cbt.com, CAND02, student123"
+              placeholder="Aarav Sharma, aarav@cbt.com, student123&#10;Diya Patel, diya@cbt.com, student123"
               className="w-full border border-gray-300 rounded p-2.5 font-mono text-[11px]"
             />
 
@@ -364,7 +345,7 @@ export const StudentManagementPage: React.FC = () => {
               <div>
                 <h3 className="text-base font-bold text-slate-900">{selectedStudent.name}</h3>
                 <div className="text-slate-500 font-mono text-[11px]">
-                  Roll: {selectedStudent.candidateId || 'N/A'} • {selectedStudent.email}
+                  {selectedStudent.email}
                 </div>
               </div>
               <button onClick={() => setSelectedStudent(null)} className="text-slate-400 p-1">

@@ -94,7 +94,7 @@ async function main() {
 
   const meStudent = await api('GET', '/auth/me', undefined, studentToken);
   assert(meStudent.status === 200, 'Student /me returns profile');
-  assert(meStudent.data.user?.candidateId === 'CET-2026-0001', 'Student candidateId matches');
+  assert(meStudent.data.user?.email === 'student@cbt.com', 'Student email matches');
 
   // ─── 3. ADMIN: Dashboard Aggregation ──────────────────────────
   console.log('\n📋 3. Admin dashboard');

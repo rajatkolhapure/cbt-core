@@ -39,8 +39,6 @@ export const OfficialScorecardModal: React.FC<OfficialScorecardModalProps> = ({
 
   const candidateDisplayName =
     attempt?.user?.name || user?.name || 'Candidate';
-  const candidateDisplayRoll =
-    attempt?.user?.candidateId || user?.candidateId || user?.email || 'N/A';
   const candidateDisplayEmail =
     attempt?.user?.email || user?.email || 'N/A';
 
@@ -101,11 +99,6 @@ export const OfficialScorecardModal: React.FC<OfficialScorecardModalProps> = ({
               <div>
                 <span className="text-slate-500 uppercase font-bold text-[10px] block">Candidate Name</span>
                 <span className="font-black text-black uppercase text-xs">{candidateDisplayName}</span>
-              </div>
-
-              <div>
-                <span className="text-slate-500 uppercase font-bold text-[10px] block">Roll Number / Candidate ID</span>
-                <span className="font-mono font-bold text-black text-xs">{candidateDisplayRoll}</span>
               </div>
 
               <div>
