@@ -714,7 +714,7 @@ export const ExamManagementPage: React.FC = () => {
                         </div>
                       </div>
                       <span className="text-[11px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
-                        {stu.candidateId || 'No Roll #'}
+                        {stu.email || 'No Email'}
                       </span>
                     </label>
                   );

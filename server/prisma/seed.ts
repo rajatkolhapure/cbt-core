@@ -48,7 +48,6 @@ async function main() {
       password: passwordHash,
       name: 'Rajat Kolhapure',
       role: Role.ADMIN,
-      candidateId: 'ADM-001',
     },
   });
   console.log(`  ✓ Admin: ${admin.name} (${admin.email})`);
@@ -59,7 +58,6 @@ async function main() {
       password: studentHash,
       name: 'Priya Sharma',
       role: Role.STUDENT,
-      candidateId: 'CET-2026-0001',
     },
   });
 
@@ -69,7 +67,6 @@ async function main() {
       password: studentHash,
       name: 'Parth Jagdale',
       role: Role.STUDENT,
-      candidateId: 'CET-2026-0002',
     },
   });
 
@@ -79,7 +76,6 @@ async function main() {
       password: studentHash,
       name: 'Rahul Mehta',
       role: Role.STUDENT,
-      candidateId: 'CET-2026-0003',
     },
   });
   console.log(`  ✓ Students: ${student1.name} (${student1.email}), ${student2.name} (${student2.email}), ${student3.name} (${student3.email})\n`);

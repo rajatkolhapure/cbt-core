@@ -98,7 +98,6 @@ export class AuthService {
 
   async verifyOtp(data: VerifyOtpInput) {
     const email = data.email.toLowerCase().trim();
-    const candidateId = data.candidateId?.trim() || null;
 
     // Check token
     const tokenRecord = await prisma.otpToken.findFirst({
@@ -126,16 +125,6 @@ export class AuthService {
       throw new AppError(409, 'An account with this email already exists.');
     }
 
-    // Check candidateId uniqueness if provided
-    if (candidateId) {
-      const existingCandidate = await prisma.user.findUnique({
-        where: { candidateId },
-      });
-      if (existingCandidate) {
-        throw new AppError(409, 'Candidate Roll Number is already registered.');
-      }
-    }
-
     // Hash password & create user
     const hashedPassword = await bcrypt.hash(data.password, AUTH_CONFIG.bcryptRounds);
     const user = await prisma.user.create({
@@ -143,7 +132,6 @@ export class AuthService {
         email,
         password: hashedPassword,
         name: data.name.trim(),
-        candidateId,
         role: 'STUDENT',
       },
       select: {
@@ -151,7 +139,6 @@ export class AuthService {
         email: true,
         name: true,
         role: true,
-        candidateId: true,
         createdAt: true,
       },
     });
@@ -207,16 +194,6 @@ export class AuthService {
       throw new AppError(409, 'Email already registered');
     }
 
-    // Check candidateId uniqueness if provided
-    if (data.candidateId) {
-      const existingCandidate = await prisma.user.findUnique({
-        where: { candidateId: data.candidateId },
-      });
-      if (existingCandidate) {
-        throw new AppError(409, 'Candidate ID already in use');
-      }
-    }
-
     const hashedPassword = await bcrypt.hash(
       data.password,
       AUTH_CONFIG.bcryptRounds
@@ -227,7 +204,6 @@ export class AuthService {
         email: data.email,
         password: hashedPassword,
         name: data.name,
-        candidateId: data.candidateId,
         role: 'STUDENT',
       },
       select: {
@@ -235,7 +211,6 @@ export class AuthService {
         email: true,
         name: true,
         role: true,
-        candidateId: true,
         createdAt: true,
       },
     });
@@ -290,7 +265,6 @@ export class AuthService {
         email: true,
         name: true,
         role: true,
-        candidateId: true,
         isActive: true,
         createdAt: true,
       },

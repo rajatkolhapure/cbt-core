@@ -10,7 +10,6 @@ export interface User {
   email: string;
   name: string;
   role: Role;
-  candidateId?: string | null;
   isActive: boolean;
   createdAt: string;
 }
@@ -167,6 +166,6 @@ export interface IntegrityEvent {
   details?: any;
   ipAddress?: string | null;
   timestamp: string;
-  user?: { name: string; email: string; candidateId?: string | null };
+  user?: { name: string; email: string };
   attempt?: { exam: { title: string } };
 }

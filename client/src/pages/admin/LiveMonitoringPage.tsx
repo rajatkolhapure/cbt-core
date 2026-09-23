@@ -46,7 +46,6 @@ interface ActiveCandidate {
     id: string;
     name: string;
     email: string;
-    candidateId?: string;
   };
   exam: {
     id: string;
@@ -93,7 +92,6 @@ interface CandidateDetails {
     id: string;
     name: string;
     email: string;
-    candidateId?: string;
   };
   exam: {
     id: string;
@@ -374,8 +372,7 @@ export const LiveMonitoringPage: React.FC = () => {
     const matchesSearch =
       !searchQuery ||
       c.student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.student.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.student.candidateId || '').toLowerCase().includes(searchQuery.toLowerCase());
+      c.student.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filterStatus === 'ALL' || c.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -564,7 +561,7 @@ export const LiveMonitoringPage: React.FC = () => {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="font-serif font-bold text-sm text-[#1C1D21] truncate">{c.student.name}</div>
-                          <div className="font-mono text-[10px] text-[#575A65] truncate">{c.student.candidateId || c.student.email}</div>
+                          <div className="font-mono text-[10px] text-[#575A65] truncate">{c.student.email}</div>
                         </div>
                         <div className={`w-2.5 h-2.5 border border-[#1C1D21] shrink-0 mt-1 ${sc.dot}`} />
                       </div>
@@ -668,7 +665,6 @@ export const LiveMonitoringPage: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="font-serif font-bold text-sm text-[#1C1D21]">{c.student.name}</div>
                           <div className="font-mono text-xs text-[#575A65]">
-                            {c.student.candidateId ? `ROLL: ${c.student.candidateId} · ` : ''}
                             {c.exam.title}
                           </div>
                         </div>
@@ -714,7 +710,7 @@ export const LiveMonitoringPage: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h2 className="font-serif font-bold text-base text-[#1C1D21] truncate">{candidateDetails.student.name}</h2>
-                      <p className="font-mono text-xs text-[#575A65] truncate">{candidateDetails.student.candidateId || candidateDetails.student.email}</p>
+                      <p className="font-mono text-xs text-[#575A65] truncate">{candidateDetails.student.email}</p>
                     </div>
                   </div>
                   <div className="space-y-1.5 text-xs font-mono">

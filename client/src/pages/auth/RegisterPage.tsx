@@ -2,15 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../api/client';
-import { ShieldCheck, ArrowRight, ArrowLeft, AlertCircle, Mail, KeyRound, User, Hash, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ArrowRight, ArrowLeft, Mail, Key, User, ShieldCheck, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { FoxCadetMascot } from '../../components/auth/FoxCadetMascot';
 
 export const RegisterPage: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [candidateId, setCandidateId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Mascot interaction state
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // OTP 6-digit state
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
@@ -112,12 +117,10 @@ export const RegisterPage: React.FC = () => {
 
   // Handle OTP digit changes
   const handleOtpDigitChange = (index: number, value: string) => {
-    // Only accept numeric characters
     const cleanValue = value.replace(/[^0-9]/g, '');
     const newDigits = [...otpDigits];
 
     if (cleanValue.length > 1) {
-      // Handle paste of full 6 digits
       const pastedChars = cleanValue.slice(0, 6).split('');
       pastedChars.forEach((char, i) => {
         if (i < 6) newDigits[i] = char;
@@ -131,7 +134,6 @@ export const RegisterPage: React.FC = () => {
     newDigits[index] = cleanValue;
     setOtpDigits(newDigits);
 
-    // Auto focus next box
     if (cleanValue && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
@@ -143,7 +145,7 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
-  // Dedicated paste handler — onChange can't see full paste because maxLength=1 truncates it
+  // Dedicated paste handler
   const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
@@ -174,10 +176,10 @@ export const RegisterPage: React.FC = () => {
         code: fullCode,
         name: name.trim(),
         password,
-        candidateId: candidateId.trim() || undefined,
       });
 
-      // Redirect immediately to student dashboard with auto-assigned exam ready
+      setIsSuccess(true);
+      await new Promise<void>((resolve) => setTimeout(resolve, 180));
       navigate('/student/dashboard', { replace: true });
     } catch (err: any) {
       setError(
@@ -190,163 +192,247 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#FBF9F5] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans selection:bg-[#1A2B4C] selection:text-[#FBF9F5]">
-      {/* Top Academic Masthead */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#1A2B4C] text-[#FBF9F5] border border-[#1C1D21] shadow-tactile mb-4">
-          <ShieldCheck className="w-6 h-6 text-[#C88A2D]" />
-        </div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1D21]">
-          Candidate Registration
-        </h1>
-        <p className="mt-1 font-mono text-xs uppercase tracking-widest text-[#575A65]">
-          Computer-Based Testing &amp; Verification Terminal
-        </p>
-      </div>
+  // Compact input class — py-2.5 for viewport optimization
+  const inputClass =
+    'w-full pl-10 pr-4 py-2.5 bg-[#121826] border border-slate-800/80 rounded-lg text-sm text-[#F3F4F6] placeholder:text-slate-500 focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32]/40 focus:outline-none transition-all';
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white border border-[#1C1D21] shadow-tactile-lg p-6 sm:p-8">
-          {/* Step Indicator */}
-          <div className="mb-6 flex items-center justify-between border-b border-[#DCD6CD] pb-3 font-mono text-[11px]">
-            <div className="flex items-center gap-2">
-              <span
-                className={`w-5 h-5 flex items-center justify-center border font-bold ${
-                  step === 1
-                    ? 'bg-[#1A2B4C] text-white border-[#1C1D21]'
-                    : 'bg-[#EBF5F0] text-[#236B47] border-[#236B47]'
-                }`}
-              >
-                1
-              </span>
-              <span className={step === 1 ? 'font-bold text-[#1C1D21]' : 'text-[#575A65]'}>
-                Credentials
+  return (
+    <div
+      onMouseMove={(e) => setMousePosition({ x: e.clientX, y: e.clientY })}
+      className="min-h-screen bg-[#0B0F17] text-stone-100 flex flex-col lg:flex-row font-sans selection:bg-[#C85A32] selection:text-white relative overflow-x-hidden"
+    >
+      {/* Dynamic Font Import */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap');
+        .font-space-grotesk {
+          font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+      `}</style>
+
+      {/* Soft Ambient Radial Canvas Wash */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#131B2A_0%,_#0D111A_45%,_#0B0F17_85%)] opacity-85 pointer-events-none" />
+
+      {/* ========================================================= */}
+      {/* LEFT 60% STAGE: Mascot Stage (Desktop)                    */}
+      {/* ========================================================= */}
+      <section
+        aria-label="Cadet Mascot Stage"
+        className="hidden lg:flex lg:w-[58%] xl:w-[60%] lg:h-screen lg:max-h-screen relative flex-col items-center justify-center p-8 lg:p-12 overflow-hidden select-none"
+      >
+        {/* Faint terracotta radial halo */}
+        <div className="absolute w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_rgba(200,90,50,0.08)_0%,_transparent_70%)] pointer-events-none" />
+
+        {/* Ambient Cosmic Depth Rings */}
+        <div className="absolute w-[460px] h-[460px] rounded-full border border-slate-800/40 pointer-events-none -translate-y-4" />
+        <div className="absolute w-[620px] h-[620px] rounded-full border border-slate-800/20 pointer-events-none -translate-y-4" />
+
+        {/* Interactive Fox Cadet Vector Mascot */}
+        <div className="relative z-10 flex flex-col items-center max-w-sm w-full">
+          <FoxCadetMascot
+            isPasswordFocused={isPasswordFocused}
+            isError={Boolean(error)}
+            isSuccess={isSuccess}
+            mousePosition={mousePosition}
+            className="w-72 xl:w-84 h-auto"
+          />
+        </div>
+
+        {/* Telemetry footer */}
+        <p className="absolute bottom-8 font-mono text-[10px] tracking-[0.25em] text-slate-600 uppercase select-none">
+          Cadet Enlistment Log · Protocol V2.6
+        </p>
+      </section>
+
+      {/* ========================================================= */}
+      {/* RIGHT 40% STAGE: Enlistment Terminal                      */}
+      {/* ========================================================= */}
+      <section
+        aria-label="Enlistment Terminal"
+        className="w-full lg:w-[42%] xl:w-[40%] min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-center items-center px-6 py-6 sm:px-10 lg:px-12 z-10 overflow-y-auto"
+      >
+        {/* Mobile Mascot (< 1024px) — full vector, no clipping */}
+        <div className="lg:hidden flex justify-center mb-4">
+          <FoxCadetMascot
+            isPasswordFocused={isPasswordFocused}
+            isError={Boolean(error)}
+            isSuccess={isSuccess}
+            mousePosition={mousePosition}
+            className="w-28 h-auto overflow-visible"
+          />
+        </div>
+
+        {/* Borderless Floating Form Container */}
+        <div className="relative w-full max-w-md space-y-3.5">
+
+          {/* Subtle Corner Tick Marks */}
+          <span className="hidden sm:block absolute -top-4 -left-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+          <span className="hidden sm:block absolute -top-4 -right-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+          <span className="hidden sm:block absolute -bottom-4 -left-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+          <span className="hidden sm:block absolute -bottom-4 -right-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
+
+          {/* Centered Editorial Header */}
+          <div className="flex flex-col items-center text-center mx-auto space-y-1">
+            <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-[#D4A373] uppercase select-none">
+              // CADET ENLISTMENT GATE
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F3F4F6] font-space-grotesk">
+              Candidate Registration
+            </h1>
+            <p className="text-xs sm:text-sm text-[#8A99AD] tracking-wide">
+              Computer-Based Testing &amp; Verification Terminal
+            </p>
+          </div>
+
+          {/* 2-Step Progress Indicator */}
+          <div className="flex items-center justify-center gap-3">
+            {/* Step 1 */}
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full transition-colors ${
+                step === 1 ? 'bg-[#D4A373] shadow-[0_0_6px_rgba(212,163,115,0.5)]' : 'bg-emerald-500'
+              }`} />
+              <span className={`font-mono text-[11px] tracking-[0.12em] uppercase transition-colors ${
+                step === 1 ? 'text-[#D4A373] font-bold' : 'text-slate-500'
+              }`}>
+                01 Credentials
               </span>
             </div>
-            <div className="w-8 h-px bg-[#1C1D21]/30" />
-            <div className="flex items-center gap-2">
-              <span
-                className={`w-5 h-5 flex items-center justify-center border font-bold ${
-                  step === 2
-                    ? 'bg-[#1A2B4C] text-white border-[#1C1D21]'
-                    : 'bg-[#F4EFEA] text-[#575A65] border-[#1C1D21]/30'
-                }`}
-              >
-                2
-              </span>
-              <span className={step === 2 ? 'font-bold text-[#1C1D21]' : 'text-[#575A65]'}>
-                OTP Verification
+
+            {/* Divider */}
+            <div className="w-8 md:w-12 border-t border-dashed border-slate-800" />
+
+            {/* Step 2 */}
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full transition-colors ${
+                step === 2 ? 'bg-[#D4A373] shadow-[0_0_6px_rgba(212,163,115,0.5)]' : 'bg-slate-700'
+              }`} />
+              <span className={`font-mono text-[11px] tracking-[0.12em] uppercase transition-colors ${
+                step === 2 ? 'text-[#D4A373] font-bold' : 'text-slate-600'
+              }`}>
+                02 Verification
               </span>
             </div>
           </div>
 
-          {/* Feedback Alerts */}
+          {/* Error Feedback Banner */}
           {error && (
-            <div className="mb-5 bg-[#FDF0F0] border border-[#A83232] text-[#A83232] px-4 py-3 text-xs flex items-start gap-2.5 shadow-xs">
-              <AlertCircle className="w-4 h-4 text-[#A83232] shrink-0 mt-0.5" />
+            <div className="bg-[#261316] text-[#FCA5A5] px-4 py-2.5 text-xs rounded-lg flex items-start gap-2.5 border border-red-950">
+              <AlertCircle className="w-4 h-4 text-[#F87171] shrink-0 mt-0.5" />
               <span className="font-medium leading-relaxed">{error}</span>
             </div>
           )}
 
+          {/* Success Feedback Banner */}
           {successMessage && !error && (
-            <div className="mb-5 bg-[#EBF5F0] border border-[#236B47] text-[#236B47] px-4 py-3 text-xs flex items-start gap-2.5 shadow-xs">
-              <CheckCircle2 className="w-4 h-4 text-[#236B47] shrink-0 mt-0.5" />
+            <div className="bg-[#0F1F17] text-emerald-300 px-4 py-2.5 text-xs rounded-lg flex items-start gap-2.5 border border-emerald-900/60">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <span className="font-medium leading-relaxed">{successMessage}</span>
             </div>
           )}
 
-          {/* STEP 1: Registration Credentials Form */}
+          {/* ====================================== */}
+          {/* STEP 1: Credentials Form               */}
+          {/* ====================================== */}
           {step === 1 && (
-            <form className="space-y-4" onSubmit={handleSendOtp}>
+            <form className="space-y-3" onSubmit={handleSendOtp}>
+              {/* Full Candidate Name */}
               <div>
-                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-[#575A65]" />
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5" />
                   Full Candidate Name
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Rahul Mehta"
-                  className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
-                />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Rahul Mehta"
+                    className={inputClass}
+                  />
+                </div>
               </div>
 
+              {/* Email Address */}
               <div>
-                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1 flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-[#575A65]" />
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5" />
                   Email Address
                 </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="candidate@example.com"
-                  className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
-                />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="cadet@domain.com"
+                    className={inputClass}
+                  />
+                </div>
               </div>
 
+              {/* Access Key / Password */}
               <div>
-                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1 flex items-center gap-1.5">
-                  <Hash className="w-3.5 h-3.5 text-[#575A65]" />
-                  Roll Number / Candidate ID <span className="text-[#8E929E] font-normal lowercase">(optional)</span>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5" />
+                  Access Key / Password
                 </label>
-                <input
-                  type="text"
-                  value={candidateId}
-                  onChange={(e) => setCandidateId(e.target.value)}
-                  placeholder="e.g. CET-2026-0005"
-                  className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
-                />
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={() => setIsPasswordFocused(false)}
+                    placeholder="Minimum 8 characters"
+                    className={inputClass}
+                  />
+                </div>
               </div>
 
+              {/* Confirm Password */}
               <div>
-                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1 flex items-center gap-1.5">
-                  <KeyRound className="w-3.5 h-3.5 text-[#575A65]" />
-                  Password
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Confirm Access Key
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 6 characters"
-                  className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
-                />
+                <div className="relative">
+                  <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={() => setIsPasswordFocused(false)}
+                    placeholder="Re-enter access key"
+                    className={inputClass}
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-[#1C1D21] mb-1 flex items-center gap-1.5">
-                  <KeyRound className="w-3.5 h-3.5 text-[#575A65]" />
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
-                  className="w-full px-3.5 py-2.5 bg-[#FBF9F5] border border-[#1C1D21] text-xs sm:text-sm font-sans focus:outline-none focus:bg-white focus:shadow-tactile transition-all"
-                />
-              </div>
-
-              <div className="pt-2">
+              {/* CTA Button */}
+              <div className="pt-1">
                 <button
                   type="submit"
                   disabled={isSendingOtp}
-                  className="w-full py-3 px-4 bg-[#1A2B4C] hover:bg-[#121F38] text-[#FBF9F5] font-mono text-xs uppercase tracking-wider font-bold btn-tactile flex items-center justify-center gap-2"
+                  className={`w-full py-3 px-5 bg-[#C85A32] hover:bg-[#B54E29] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 ${
+                    isSendingOtp ? 'opacity-80 cursor-wait' : 'cursor-pointer'
+                  }`}
                 >
                   {isSendingOtp ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 border-2 border-[#FBF9F5] border-t-transparent animate-spin" />
-                      <span>Dispatching OTP...</span>
+                      <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                      <span>Dispatching Code…</span>
                     </div>
                   ) : (
                     <>
-                      <span>Send Verification Code</span>
-                      <ArrowRight className="w-4 h-4 text-[#C88A2D]" />
+                      <span>[ Send Verification Code</span>
+                      <ArrowRight className="w-4 h-4" />
+                      <span>]</span>
                     </>
                   )}
                 </button>
@@ -354,20 +440,22 @@ export const RegisterPage: React.FC = () => {
             </form>
           )}
 
-          {/* STEP 2: 6-Digit Snappy OTP Input */}
+          {/* ====================================== */}
+          {/* STEP 2: OTP Verification Terminal      */}
+          {/* ====================================== */}
           {step === 2 && (
-            <form className="space-y-5" onSubmit={handleVerifyOtp}>
-              <div className="text-center">
-                <p className="font-mono text-xs text-[#575A65]">
-                  Enter the 6-digit verification code sent to:
+            <form className="space-y-4" onSubmit={handleVerifyOtp}>
+              <div className="text-center space-y-1">
+                <p className="text-xs text-[#8A99AD] font-mono">
+                  Enter the 6-digit transmission code dispatched to:
                 </p>
-                <p className="font-mono text-sm font-bold text-[#1A2B4C] mt-0.5">
+                <p className="text-sm font-mono font-bold text-[#D4A373]">
                   {email}
                 </p>
               </div>
 
-              {/* 6-box input */}
-              <div className="flex justify-center items-center gap-2 sm:gap-2.5 my-4">
+              {/* 6-Digit Input Grid */}
+              <div className="flex justify-center items-center gap-2 sm:gap-3 my-3">
                 {otpDigits.map((digit, idx) => (
                   <input
                     key={idx}
@@ -380,66 +468,81 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                     onPaste={(e) => handleOtpPaste(e, idx)}
-                    className="w-10 sm:w-12 h-12 sm:h-14 text-center font-mono text-xl sm:text-2xl font-bold bg-[#FBF9F5] border-2 border-[#1C1D21] text-[#1C1D21] focus:bg-white focus:border-[#1A2B4C] focus:shadow-tactile focus:outline-none transition-all"
+                    className="w-11 h-13 sm:w-13 sm:h-15 text-center font-mono text-lg sm:text-xl font-bold bg-[#151C2C] border border-slate-800 rounded-xl text-[#F3F4F6] focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32]/40 focus:outline-none transition-all"
                   />
                 ))}
               </div>
 
-              <div className="space-y-3 pt-2">
+              {/* Resend Telemetry Bar */}
+              <div className="flex items-center justify-center">
+                {cooldown > 0 ? (
+                  <span className="font-mono text-[11px] tracking-wider text-slate-500 uppercase">
+                    Resend Code In ({cooldown}s)
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={isSendingOtp}
+                    className="font-mono text-[11px] tracking-wider text-[#D4A373] hover:text-[#E0B68A] font-bold uppercase flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  >
+                    <RotateCcw className={`w-3 h-3 ${isSendingOtp ? 'animate-spin' : ''}`} />
+                    Request New Code
+                  </button>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3 pt-1">
                 <button
                   type="submit"
                   disabled={isVerifying || otpDigits.join('').length !== 6}
-                  className="w-full py-3 px-4 bg-[#236B47] hover:bg-[#1C5538] text-white font-mono text-xs uppercase tracking-wider font-bold btn-tactile flex items-center justify-center gap-2 disabled:opacity-40"
+                  className={`w-full py-3 px-5 bg-[#C85A32] hover:bg-[#B54E29] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 disabled:opacity-40 ${
+                    isVerifying ? 'opacity-80 cursor-wait' : 'cursor-pointer'
+                  }`}
                 >
                   {isVerifying ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin" />
-                      <span>Verifying &amp; Initializing Account...</span>
+                      <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                      <span>Activating Account…</span>
                     </div>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-[#FBF9F5]" />
-                      <span>Verify &amp; Launch Portal</span>
+                      <span>[ Activate Cadet Account</span>
+                      <ArrowRight className="w-4 h-4" />
+                      <span>]</span>
                     </>
                   )}
                 </button>
 
-                <div className="flex items-center justify-between text-xs font-mono pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setStep(1);
-                      setError(null);
-                    }}
-                    className="text-[#575A65] hover:text-[#1C1D21] flex items-center gap-1 transition"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Edit Details</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleResendOtp}
-                    disabled={cooldown > 0 || isSendingOtp}
-                    className="text-[#1A2B4C] font-bold hover:underline disabled:text-[#8E929E] disabled:no-underline flex items-center gap-1"
-                  >
-                    <RefreshCw className={`w-3 h-3 ${isSendingOtp ? 'animate-spin' : ''}`} />
-                    {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend Code'}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep(1);
+                    setError(null);
+                    setSuccessMessage(null);
+                  }}
+                  className="w-full text-center font-mono text-xs text-slate-400 hover:text-[#D4A373] flex items-center justify-center gap-1.5 transition-colors py-1.5"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>← Back to Credentials</span>
+                </button>
               </div>
             </form>
           )}
 
-          {/* Micro Footer */}
-          <div className="mt-6 pt-4 border-t border-[#DCD6CD] flex items-center justify-between text-[11px] font-mono text-[#575A65]">
-            <span>Already registered?</span>
-            <Link to="/login" className="font-bold text-[#1A2B4C] hover:underline">
-              Sign In Here →
+          {/* Terminal Footer */}
+          <div className="pt-1 text-center">
+            <Link
+              to="/login"
+              className="text-xs text-stone-400 hover:text-[#D4A373] font-medium transition-colors inline-flex items-center gap-1.5"
+            >
+              <span>Already registered? Sign In Here</span>
+              <span>→</span>
             </Link>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

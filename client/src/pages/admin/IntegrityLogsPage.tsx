@@ -109,7 +109,7 @@ export const IntegrityLogsPage: React.FC = () => {
                     <td className="py-3 px-4">
                       <div className="font-semibold text-slate-900">{evt.user?.name || 'Unknown'}</div>
                       <div className="font-mono text-[10px] text-slate-400">
-                        {evt.user?.candidateId || evt.user?.email}
+                        {evt.user?.email || 'N/A'}
                       </div>
                     </td>
                     <td className="py-3 px-4 text-slate-700 font-medium">

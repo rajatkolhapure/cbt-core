@@ -145,7 +145,7 @@ export const DashboardPage: React.FC = () => {
                   <div>
                     <div className="font-semibold text-slate-900">{att.user?.name}</div>
                     <div className="text-slate-500 text-[11px] mt-0.5">
-                      {att.exam?.title} • <span className="font-mono">{att.user?.candidateId || 'No ID'}</span>
+                      {att.exam?.title} • <span className="font-mono">{att.user?.email || 'No ID'}</span>
                     </div>
                   </div>
 
