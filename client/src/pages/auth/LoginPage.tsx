@@ -127,7 +127,7 @@ export const LoginPage: React.FC = () => {
           {/* Centered Editorial Header Hierarchy */}
           <div className="flex flex-col items-center text-center mx-auto space-y-2">
             <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-[#D4A373] uppercase select-none">
-              // CADET ACCESS GATE
+              // STUDENT ACCESS GATE
             </span>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#F3F4F6] font-space-grotesk">
               Launch Station
@@ -181,9 +181,8 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3.5 px-5 bg-[#C85A32] hover:bg-[#B64B22] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 ${
-                  isSubmitting ? 'opacity-80 cursor-wait' : 'cursor-pointer'
-                }`}
+                className={`w-full py-3.5 px-5 bg-[#C85A32] hover:bg-[#B64B22] text-[#F3F4F6] font-mono text-sm font-bold rounded-lg shadow-lg active:translate-y-[1px] transition-all flex items-center justify-center gap-2 ${isSubmitting ? 'opacity-80 cursor-wait' : 'cursor-pointer'
+                  }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
