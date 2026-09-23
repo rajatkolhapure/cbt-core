@@ -149,21 +149,21 @@ export const LoginPage: React.FC = () => {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="block text-xs font-mono uppercase tracking-wider text-stone-300 mb-2">
-                Candidate / Admin Email
+                Student / Admin Email
               </label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="candidate@cbt.com"
+                placeholder="student@cbt.com"
                 className="w-full px-4 py-3 bg-[#121826] border-none rounded-lg text-sm text-[#F3F4F6] placeholder:text-stone-500 focus:ring-1 focus:ring-[#D4A373]/70 focus:outline-none transition-all"
               />
             </div>
 
             <div>
               <label className="block text-xs font-mono uppercase tracking-wider text-stone-300 mb-2">
-                Access Key / Password
+                Password
               </label>
               <input
                 type="password"

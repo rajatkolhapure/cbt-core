@@ -48,7 +48,7 @@ export const RegisterPage: React.FC = () => {
     setError(null);
 
     if (!name.trim()) {
-      setError('Please enter your full candidate name.');
+      setError('Please enter your full student name.');
       return;
     }
     if (!email.trim() || !email.includes('@')) {
@@ -219,9 +219,6 @@ export const RegisterPage: React.FC = () => {
         aria-label="Cadet Mascot Stage"
         className="hidden lg:flex lg:w-[58%] xl:w-[60%] lg:h-screen lg:max-h-screen relative flex-col items-center justify-center p-8 lg:p-12 overflow-hidden select-none"
       >
-        {/* Faint terracotta radial halo */}
-        <div className="absolute w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_rgba(200,90,50,0.08)_0%,_transparent_70%)] pointer-events-none" />
-
         {/* Ambient Cosmic Depth Rings */}
         <div className="absolute w-[460px] h-[460px] rounded-full border border-slate-800/40 pointer-events-none -translate-y-4" />
         <div className="absolute w-[620px] h-[620px] rounded-full border border-slate-800/20 pointer-events-none -translate-y-4" />
@@ -236,11 +233,6 @@ export const RegisterPage: React.FC = () => {
             className="w-72 xl:w-84 h-auto"
           />
         </div>
-
-        {/* Telemetry footer */}
-        <p className="absolute bottom-8 font-mono text-[10px] tracking-[0.25em] text-slate-600 uppercase select-none">
-          Cadet Enlistment Log · Protocol V2.6
-        </p>
       </section>
 
       {/* ========================================================= */}
@@ -271,16 +263,10 @@ export const RegisterPage: React.FC = () => {
           <span className="hidden sm:block absolute -bottom-4 -right-4 font-mono text-xs text-stone-700/60 select-none pointer-events-none">+</span>
 
           {/* Centered Editorial Header */}
-          <div className="flex flex-col items-center text-center mx-auto space-y-1">
-            <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-[#D4A373] uppercase select-none">
-              // CADET ENLISTMENT GATE
-            </span>
+          <div className="flex flex-col items-center text-center mx-auto">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F3F4F6] font-space-grotesk">
-              Candidate Registration
+              Student Registration
             </h1>
-            <p className="text-xs sm:text-sm text-[#8A99AD] tracking-wide">
-              Computer-Based Testing &amp; Verification Terminal
-            </p>
           </div>
 
           {/* 2-Step Progress Indicator */}
@@ -334,11 +320,11 @@ export const RegisterPage: React.FC = () => {
           {/* ====================================== */}
           {step === 1 && (
             <form className="space-y-3" onSubmit={handleSendOtp}>
-              {/* Full Candidate Name */}
+              {/* Full Student Name */}
               <div>
                 <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" />
-                  Full Candidate Name
+                  Full Student Name
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
@@ -366,17 +352,17 @@ export const RegisterPage: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="cadet@domain.com"
+                    placeholder="student@cbt.com"
                     className={inputClass}
                   />
                 </div>
               </div>
 
-              {/* Access Key / Password */}
+              {/* Password */}
               <div>
                 <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
                   <Key className="w-3.5 h-3.5" />
-                  Access Key / Password
+                  Password
                 </label>
                 <div className="relative">
                   <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
@@ -397,7 +383,7 @@ export const RegisterPage: React.FC = () => {
               <div>
                 <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8A99AD] mb-1 flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  Confirm Access Key
+                  Confirm Password
                 </label>
                 <div className="relative">
                   <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A99AD] pointer-events-none" />
@@ -408,7 +394,7 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     onFocus={() => setIsPasswordFocused(true)}
                     onBlur={() => setIsPasswordFocused(false)}
-                    placeholder="Re-enter access key"
+                    placeholder="Re-enter password"
                     className={inputClass}
                   />
                 </div>
