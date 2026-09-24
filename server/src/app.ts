@@ -24,7 +24,6 @@ const envCandidates = [
 for (const envPath of envCandidates) {
   if (fs.existsSync(envPath)) {
     dotenv.config({ path: envPath });
-    break;
   }
 }
 
@@ -87,7 +86,61 @@ app.use('/api/exams', apiLimiter, examRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/attempts', apiLimiter, attemptRoutes);
 app.use('/api/integrity', apiLimiter, integrityRoutes);
+
+async function forwardToDiscord(payload: any) {
+  const discordUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!discordUrl) return;
+
+  const { event, attemptId, data, integrityFlags, message } = payload;
+  const isSuspicious =
+    integrityFlags?.screenExited ||
+    integrityFlags?.fullscreenExited ||
+    (integrityFlags?.cheatingFlags && Object.keys(integrityFlags.cheatingFlags).length > 0);
+
+  const cheatingList =
+    integrityFlags?.cheatingFlags && Object.keys(integrityFlags.cheatingFlags).length > 0
+      ? Object.keys(integrityFlags.cheatingFlags).join(', ')
+      : 'None';
+
+  const embedFields = [
+    { name: 'Attempt ID', value: attemptId ? `\`${attemptId}\`` : 'N/A', inline: true },
+    { name: 'Device Type', value: integrityFlags?.deviceType || 'unknown', inline: true },
+    { name: 'Screen Exited', value: integrityFlags?.screenExited ? '⚠️ Yes' : '✅ No', inline: true },
+    { name: 'Fullscreen Exited', value: integrityFlags?.fullscreenExited ? '⚠️ Yes' : '✅ No', inline: true },
+    { name: 'Cheating Flags', value: cheatingList, inline: false },
+  ];
+
+  if (message || data?.message) {
+    embedFields.push({ name: 'Details', value: String(message || data?.message), inline: false });
+  }
+
+  const discordBody = {
+    username: 'CBT Integrity Monitor',
+    avatar_url: 'https://cdn-icons-png.flaticon.com/512/2092/2092663.png',
+    embeds: [
+      {
+        title: `${isSuspicious ? '🚨' : 'ℹ️'} Integrity Alert: ${event || 'Event Triggered'}`,
+        color: isSuspicious ? 15158332 : 3447003,
+        fields: embedFields,
+        timestamp: new Date().toISOString(),
+        footer: { text: 'CBT Anti-Cheat Realtime Proctoring' },
+      },
+    ],
+  };
+
+  try {
+    await fetch(discordUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(discordBody),
+    });
+  } catch (err) {
+    console.warn('Failed to forward webhook to Discord:', err);
+  }
+}
+
 app.post('/api/webhooks', apiLimiter, (req, res) => {
+  forwardToDiscord(req.body).catch(() => {});
   res.status(200).json({ status: 'ok', received: req.body });
 });
 
