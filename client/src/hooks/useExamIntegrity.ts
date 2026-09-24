@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../api/client';
+import {
+  recordCheatingFlag,
+  handleVisibilityChange as trackVisibilityChange,
+  handleFullscreenChange as trackFullscreenChange,
+} from '../client/integrityTracker';
+import { dispatchWebhook } from '../server/webhooks';
 
 export interface IntegrityViolation {
   type: string;
@@ -93,6 +99,17 @@ export function useExamIntegrity({
       } catch (err) {
         console.warn('Failed to report integrity event:', err);
       }
+
+      try {
+        await dispatchWebhook('/api/webhooks', {
+          event: eventType,
+          attemptId,
+          data: details,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (webhookErr) {
+        console.warn('Webhook dispatch failed / queued:', webhookErr);
+      }
     },
     [attemptId, isEnabled]
   );
@@ -163,10 +180,12 @@ export function useExamIntegrity({
     }
 
     const handleFullscreenChange = () => {
+      trackFullscreenChange();
       const active = !!document.fullscreenElement;
       setIsFullscreen(active);
 
       if (!active && hasStartedFullscreen) {
+        recordCheatingFlag('fullscreenExit');
         recordViolation(
           'FULLSCREEN_EXIT',
           'You exited fullscreen mode. CBT examinations require strict fullscreen focus.'
@@ -176,6 +195,7 @@ export function useExamIntegrity({
     };
 
     const handleVisibilityChange = () => {
+      trackVisibilityChange();
       if (document.hidden) {
         recordViolation(
           'VISIBILITY_HIDDEN',
@@ -216,16 +236,19 @@ export function useExamIntegrity({
 
     const handleCopy = (e: ClipboardEvent) => {
       e.preventDefault();
+      recordCheatingFlag('copyPaste');
       recordViolation('COPY_ATTEMPT', 'Copying text from the question paper is strictly prohibited.');
     };
 
     const handlePaste = (e: ClipboardEvent) => {
       e.preventDefault();
+      recordCheatingFlag('copyPaste');
       recordViolation('PASTE_ATTEMPT', 'Pasting external content into the test console is prohibited.');
     };
 
     const handleCut = (e: ClipboardEvent) => {
       e.preventDefault();
+      recordCheatingFlag('copyPaste');
       recordViolation('CUT_ATTEMPT', 'Clipboard cut actions are disabled.');
     };
 
@@ -278,6 +301,7 @@ export function useExamIntegrity({
       }
       if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
         e.preventDefault();
+        recordCheatingFlag('devToolsOpen');
         recordViolation('DEVTOOLS_OPEN', 'Viewing page source is disabled.');
       }
       if (
@@ -285,10 +309,12 @@ export function useExamIntegrity({
         ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key))
       ) {
         e.preventDefault();
+        recordCheatingFlag('devToolsOpen');
         recordViolation('DEVTOOLS_OPEN', 'Opening developer tools is prohibited.');
       }
       if (e.key === 'F5' || ((e.ctrlKey || e.metaKey) && (e.key === 'r' || e.key === 'R'))) {
         e.preventDefault();
+        recordCheatingFlag('devToolsOpen');
         recordViolation('DEVTOOLS_OPEN', 'Page reload shortcut intercepted. Use CBT navigation buttons.');
       }
     };

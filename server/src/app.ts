@@ -87,6 +87,9 @@ app.use('/api/exams', apiLimiter, examRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/attempts', apiLimiter, attemptRoutes);
 app.use('/api/integrity', apiLimiter, integrityRoutes);
+app.post('/api/webhooks', apiLimiter, (req, res) => {
+  res.status(200).json({ status: 'ok', received: req.body });
+});
 
 // Static assets & SPA fallback (serves built React frontend from client/dist)
 const clientDistPath = path.resolve(__dirname, '../../client/dist');

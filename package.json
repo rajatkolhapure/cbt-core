@@ -2,6 +2,7 @@
   "name": "cbt-platform",
   "private": true,
   "scripts": {
+    "test": "tsx --test tests/integrity.test.ts",
     "build": "npm run build --workspace=client",
     "start": "npm run build --workspace=client && npm run start --workspace=server",
     "serve": "npm run start --workspace=server",
