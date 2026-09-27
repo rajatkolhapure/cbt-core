@@ -52,6 +52,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [token]);
 
   const login = async (email: string, password: string) => {
+    // Clear any previous session cached stats / in-memory tokens
+    sessionStorage.clear();
+    localStorage.removeItem('cbt_student_stats');
+    localStorage.removeItem('cbt_cached_tests');
+
     const res = await api.post('/auth/login', { email, password });
     const { user, token } = res.data;
     setUser(user);

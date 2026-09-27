@@ -411,6 +411,9 @@ export class AttemptService {
     }
 
     const evaluation = ScoringEngine.evaluateExam(evaluationQuestions);
+    const totalQuestions = evaluationQuestions.length;
+    const testAccuracy = totalQuestions > 0 ? (evaluation.correctCount / totalQuestions) * 100 : 0;
+    const roundedAccuracy = Math.round(testAccuracy * 100) / 100;
 
     const now = new Date();
     const updatedAttempt = await prisma.$transaction(async (tx) => {
@@ -425,6 +428,35 @@ export class AttemptService {
           correctCount: evaluation.correctCount,
           incorrectCount: evaluation.incorrectCount,
           unansweredCount: evaluation.unansweredCount,
+          accuracy: roundedAccuracy,
+        },
+      });
+
+      // Update student user aggregate metrics
+      const studentAttempts = await tx.attempt.findMany({
+        where: { userId, state: { in: [AttemptState.SUBMITTED, AttemptState.EVALUATED] } },
+        select: { accuracy: true },
+      });
+      const validAccuracies = studentAttempts
+        .map((a) => a.accuracy)
+        .filter((acc): acc is number => acc !== null && acc !== undefined);
+      const overallAccuracy = validAccuracies.length > 0
+        ? Math.round((validAccuracies.reduce((sum, val) => sum + val, 0) / validAccuracies.length) * 100) / 100
+        : roundedAccuracy;
+
+      const attemptedCount = await tx.attempt.count({
+        where: { userId, state: { in: [AttemptState.SUBMITTED, AttemptState.EVALUATED] } },
+      });
+      const assignedCount = await tx.examAssignment.count({
+        where: { userId },
+      });
+
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          attemptedTestsCount: attemptedCount,
+          assignedTestsCount: assignedCount,
+          accuracy: overallAccuracy,
         },
       });
 
@@ -438,6 +470,7 @@ export class AttemptService {
             isAutoSubmit,
             marksObtained: evaluation.marksObtained,
             totalMarks: evaluation.totalPossibleMarks,
+            accuracy: roundedAccuracy,
           },
         },
       });

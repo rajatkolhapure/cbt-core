@@ -254,7 +254,31 @@ export class AuthService {
     const token = this.generateToken(user);
     const { password: _, ...userWithoutPassword } = user;
 
-    return { user: userWithoutPassword, token };
+    // Safely read assigned_tests_count with defensive fallback and count query if missing
+    let assignedTestsCount = (user as any)?.assignedTestsCount ?? (user as any)?.assigned_tests_count;
+    if (assignedTestsCount === undefined || assignedTestsCount === null) {
+      try {
+        assignedTestsCount = await prisma.examAssignment.count({
+          where: { userId: user.id },
+        });
+      } catch {
+        assignedTestsCount = 0;
+      }
+    }
+
+    const attemptedTestsCount = (user as any)?.attemptedTestsCount ?? (user as any)?.attempted_tests_count ?? 0;
+    const accuracy = (user as any)?.accuracy ?? 0;
+
+    const safeUser = {
+      ...userWithoutPassword,
+      assignedTestsCount,
+      assigned_tests_count: assignedTestsCount,
+      attemptedTestsCount,
+      attempted_tests_count: attemptedTestsCount,
+      accuracy,
+    };
+
+    return { user: safeUser, token };
   }
 
   async getProfile(userId: string) {
@@ -267,6 +291,9 @@ export class AuthService {
         role: true,
         isActive: true,
         createdAt: true,
+        assignedTestsCount: true,
+        attemptedTestsCount: true,
+        accuracy: true,
       },
     });
 
@@ -274,7 +301,28 @@ export class AuthService {
       throw new AppError(404, 'User not found');
     }
 
-    return user;
+    let assignedTestsCount = user?.assignedTestsCount ?? (user as any)?.assigned_tests_count;
+    if (assignedTestsCount === undefined || assignedTestsCount === null) {
+      try {
+        assignedTestsCount = await prisma.examAssignment.count({
+          where: { userId: user.id },
+        });
+      } catch {
+        assignedTestsCount = 0;
+      }
+    }
+
+    const attemptedTestsCount = user?.attemptedTestsCount ?? (user as any)?.attempted_tests_count ?? 0;
+    const accuracy = user?.accuracy ?? 0;
+
+    return {
+      ...user,
+      assignedTestsCount,
+      assigned_tests_count: assignedTestsCount,
+      attemptedTestsCount,
+      attempted_tests_count: attemptedTestsCount,
+      accuracy,
+    };
   }
 
   async saveHardwareProfile(

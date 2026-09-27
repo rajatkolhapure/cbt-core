@@ -5,6 +5,7 @@ import { AppError } from './error.middleware';
 
 export interface JwtPayload {
   userId: string;
+  id?: string;
   email: string;
   role: string;
 }
@@ -29,6 +30,9 @@ export function requireAuth(
 
   try {
     const payload = jwt.verify(token, AUTH_CONFIG.jwtSecret) as JwtPayload;
+    if (payload.userId && !payload.id) {
+      payload.id = payload.userId;
+    }
     req.user = payload;
     next();
   } catch {

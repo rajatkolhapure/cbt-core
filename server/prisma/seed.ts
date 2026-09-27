@@ -11,7 +11,7 @@
  * Run: npx tsx prisma/seed.ts
  */
 
-import { PrismaClient, QuestionType, Difficulty, Role, ExamEnvironment } from '@prisma/client';
+import { PrismaClient, QuestionType, Difficulty, Role, ExamEnvironment, AttemptState } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -1061,6 +1061,42 @@ async function main() {
     });
   }
   console.log('  ✓ All 3 students assigned to both exams\n');
+
+  // ─── 6b. SEED COMPLETED ATTEMPTS & REAL ACCURACY ───────────────────
+  console.log('📝 Seeding completed attempts with live accuracy metrics...');
+  const totalQ = 25;
+  const correctQ = 18;
+  const incorrectQ = 4;
+  const unansweredQ = 3;
+  const marksObtained = 68;
+  const testAccuracy = Math.round((correctQ / totalQ) * 1000) / 10; // 72.0%
+
+  await prisma.attempt.create({
+    data: {
+      examId: jeeExam.id,
+      userId: student1.id,
+      state: AttemptState.EVALUATED,
+      startedAt: new Date(Date.now() - 86400000 * 2),
+      submittedAt: new Date(Date.now() - 86400000 * 2 + 3600000),
+      totalMarks: 100,
+      marksObtained,
+      percentage: 68.0,
+      correctCount: correctQ,
+      incorrectCount: incorrectQ,
+      unansweredCount: unansweredQ,
+      accuracy: testAccuracy,
+    },
+  });
+
+  await prisma.user.update({
+    where: { id: student1.id },
+    data: {
+      assignedTestsCount: 2,
+      attemptedTestsCount: 1,
+      accuracy: testAccuracy,
+    },
+  });
+  console.log(`  ✓ Created evaluated attempt for ${student1.email} with accuracy ${testAccuracy}%\n`);
 
   // ─── 7. SUMMARY ────────────────────────────────────────────────────
   console.log('═══════════════════════════════════════════════════════');

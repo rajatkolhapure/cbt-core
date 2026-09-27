@@ -6,6 +6,17 @@
   --font-mono: "IBM Plex Mono", "JetBrains Mono", Menlo, monospace;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
+  --color-space-void: #0B0F17;
+  --color-space-canvas: #0B0F17;
+  --color-space-surface: #151C2C;
+  --color-space-card: #151C2C;
+  --color-space-cta: #C85A32;
+  --color-space-cta-hover: #DC6C40;
+  --color-space-telemetry: #D4A373;
+  --color-space-ochre: #D4A373;
+  --color-space-border: #263044;
+  --color-space-muted: #8791A5;
+
   --color-parchment: #FBF9F5;
   --color-parchment-light: #FFFFFF;
   --color-parchment-surface: #F4EFEA;

@@ -2,7 +2,7 @@
   "name": "cbt-platform",
   "private": true,
   "scripts": {
-    "test": "tsx --test tests/integrity.test.ts",
+    "test": "tsx --test tests/integrity.test.ts tests/homepage.test.ts",
     "build": "npm run build --workspace=client",
     "start": "npm run build --workspace=client && npm run start --workspace=server",
     "serve": "npm run start --workspace=server",
@@ -14,5 +14,12 @@
     "db:seed": "npm run db:seed --workspace=server",
     "db:studio": "npm run db:studio --workspace=server"
   },
-  "workspaces": ["client", "server"]
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "dependencies": {
+    "lucide-react": "^1.48.0",
+    "recharts": "^3.10.1"
+  }
 }

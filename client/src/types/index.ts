@@ -12,6 +12,11 @@ export interface User {
   role: Role;
   isActive: boolean;
   createdAt: string;
+  assignedTestsCount?: number;
+  assigned_tests_count?: number;
+  attemptedTestsCount?: number;
+  attempted_tests_count?: number;
+  accuracy?: number;
 }
 
 export interface Subject {

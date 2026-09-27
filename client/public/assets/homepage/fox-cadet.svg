@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none" className="fox-cadet-mascot" role="img" aria-label="Fox Cadet Space Mascot">
+  <defs>
+    <!-- Background Helmet Glow -->
+    <radialGradient id="helmetAura" cx="50%" cy="50%" r="50%" fx="40%" fy="35%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18" />
+      <stop offset="60%" stop-color="#818cf8" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0b0f17" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Glass Dome Gradient -->
+    <radialGradient id="glassSphere" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+      <stop offset="30%" stop-color="#38bdf8" stop-opacity="0.15" />
+      <stop offset="70%" stop-color="#1e293b" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.7" />
+    </radialGradient>
+
+    <!-- Helmet Ring Metallic -->
+    <linearGradient id="collarMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <!-- Ochre Gold Accents -->
+    <linearGradient id="ochreGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#d4a373" />
+      <stop offset="100%" stop-color="#c85a32" />
+    </linearGradient>
+
+    <!-- Fox Fur Primary (Space Cadet Rust/Terracotta) -->
+    <linearGradient id="foxFur" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e07a5f" />
+      <stop offset="50%" stop-color="#c85a32" />
+      <stop offset="100%" stop-color="#9a3412" />
+    </linearGradient>
+
+    <!-- Inner Ear -->
+    <linearGradient id="innerEar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fecdd3" />
+      <stop offset="100%" stop-color="#fda4af" />
+    </linearGradient>
+
+    <!-- Visor Reflection Arc -->
+    <linearGradient id="visorGleam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65" />
+      <stop offset="40%" stop-color="#ffffff" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Space Atmosphere Back Glow -->
+  <circle cx="120" cy="115" r="95" fill="url(#helmetAura)" />
+
+  <!-- Space Cadet Suit Collar & Shoulder Pads -->
+  <g id="space-suit">
+    <!-- Back Collar Base -->
+    <path d="M60 195 C60 180, 85 170, 120 170 C155 170, 180 180, 180 195 L195 225 C195 235, 175 238, 120 238 C65 238, 45 235, 45 225 Z" fill="url(#collarMetal)" stroke="#263044" stroke-width="2" />
+    
+    <!-- Chest Plate & Ochre Insignia Stripe -->
+    <path d="M80 192 C95 188, 145 188, 160 192 L168 234 C145 238, 95 238, 72 234 Z" fill="#151c2c" stroke="#334155" stroke-width="1.5" />
+    <path d="M102 195 L138 195 L135 228 L105 228 Z" fill="url(#ochreGold)" opacity="0.9" />
+    
+    <!-- Cadet Star Badge -->
+    <polygon points="120,202 123,209 130,210 125,215 126,222 120,218 114,222 115,215 110,210 117,209" fill="#0b0f17" />
+    
+    <!-- Suit Screws/Rivets -->
+    <circle cx="70" cy="205" r="2.5" fill="#d4a373" />
+    <circle cx="170" cy="205" r="2.5" fill="#d4a373" />
+    <circle cx="60" cy="220" r="2" fill="#8791a5" />
+    <circle cx="180" cy="220" r="2" fill="#8791a5" />
+
+    <!-- Lower Neck Ring Seal -->
+    <ellipse cx="120" cy="174" rx="58" ry="14" fill="#0b0f17" stroke="#334155" stroke-width="3" />
+    <ellipse cx="120" cy="174" rx="55" ry="11" fill="none" stroke="#d4a373" stroke-width="1.5" stroke-dasharray="4 3" />
+  </g>
+
+  <!-- Inside Bubble: The Fox Cadet -->
+  <g id="fox-cadet">
+    <!-- Left Ear Outer -->
+    <path d="M78 115 L62 55 C60 50, 68 46, 73 50 L102 88 Z" fill="url(#foxFur)" stroke="#7c2d12" stroke-width="1.5" />
+    <!-- Left Ear Inner -->
+    <path d="M76 102 L68 62 C67 60, 71 58, 74 61 L93 86 Z" fill="url(#innerEar)" />
+    <!-- Left Ear Fur Tuft -->
+    <path d="M70 75 Q78 80, 84 75 Q80 88, 86 92" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none" />
+
+    <!-- Right Ear Outer -->
+    <path d="M162 115 L178 55 C180 50, 172 46, 167 50 L138 88 Z" fill="url(#foxFur)" stroke="#7c2d12" stroke-width="1.5" />
+    <!-- Right Ear Inner -->
+    <path d="M164 102 L172 62 C173 60, 169 58, 166 61 L147 86 Z" fill="url(#innerEar)" />
+    <!-- Right Ear Fur Tuft -->
+    <path d="M170 75 Q162 80, 156 75 Q160 88, 154 92" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none" />
+
+    <!-- Fox Head Base Shape -->
+    <ellipse cx="120" cy="120" rx="46" ry="40" fill="url(#foxFur)" />
+
+    <!-- White Cheek Fluff / Muzzle Sides -->
+    <path d="M75 125 C68 132, 69 146, 85 152 C95 156, 110 156, 120 156 C130 156, 145 156, 155 152 C171 146, 172 132, 165 125 C156 128, 144 126, 136 122 C131 120, 125 120, 120 120 C115 120, 109 120, 104 122 C96 126, 84 128, 75 125 Z" fill="#f8fafc" />
+
+    <!-- Forehead Ochre Diamond Marking -->
+    <polygon points="120,86 126,98 120,108 114,98" fill="#d4a373" opacity="0.85" />
+
+    <!-- Big Curious Eyes (Cadet Focus) -->
+    <!-- Left Eye -->
+    <g id="left-eye">
+      <ellipse cx="102" cy="118" rx="8.5" ry="10" fill="#0b0f17" />
+      <ellipse cx="102" cy="118" rx="7.5" ry="9" fill="#1e293b" />
+      <circle cx="100" cy="115" r="3.5" fill="#ffffff" />
+      <circle cx="104.5" cy="122" r="1.5" fill="#ffffff" />
+      <circle cx="101" cy="117" r="7" fill="none" stroke="#d4a373" stroke-width="0.8" opacity="0.7" />
+    </g>
+
+    <!-- Right Eye -->
+    <g id="right-eye">
+      <ellipse cx="138" cy="118" rx="8.5" ry="10" fill="#0b0f17" />
+      <ellipse cx="138" cy="118" rx="7.5" ry="9" fill="#1e293b" />
+      <circle cx="136" cy="115" r="3.5" fill="#ffffff" />
+      <circle cx="140.5" cy="122" r="1.5" fill="#ffffff" />
+      <circle cx="137" cy="117" r="7" fill="none" stroke="#d4a373" stroke-width="0.8" opacity="0.7" />
+    </g>
+
+    <!-- Cute Cadet Fox Nose -->
+    <path d="M116 134 C116 132, 124 132, 124 134 C124 137, 121 140, 120 140 C119 140, 116 137, 116 134 Z" fill="#0f172a" />
+    <circle cx="118.5" cy="133.5" r="1" fill="#ffffff" opacity="0.8" />
+
+    <!-- Fox Cadet Smile -->
+    <path d="M114 142 Q120 146, 126 142" stroke="#0f172a" stroke-width="1.8" stroke-linecap="round" fill="none" />
+
+    <!-- Cute Whiskers -->
+    <line x1="74" y1="135" x2="60" y2="132" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+    <line x1="73" y1="140" x2="58" y2="142" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+    <line x1="166" y1="135" x2="180" y2="132" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+    <line x1="167" y1="140" x2="182" y2="142" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+  </g>
+
+  <!-- Bubble Space Helmet (Transparent Spherical Visor) -->
+  <g id="bubble-helmet">
+    <!-- Bubble Dome Glass Surface -->
+    <circle cx="120" cy="112" r="76" fill="url(#glassSphere)" />
+    
+    <!-- Outer Glass Ring Rim -->
+    <circle cx="120" cy="112" r="76" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.4" />
+    <circle cx="120" cy="112" r="75" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.3" />
+
+    <!-- Curved Reflection Sheen / Arc Highlight (Top-Left) -->
+    <path d="M72 75 A66 66 0 0 1 148 48" stroke="url(#visorGleam)" stroke-width="5" stroke-linecap="round" fill="none" />
+    <path d="M64 92 A66 66 0 0 1 76 68" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-opacity="0.5" fill="none" />
+
+    <!-- Secondary Rim Glint (Bottom-Right) -->
+    <path d="M165 145 A66 66 0 0 0 182 118" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.4" fill="none" />
+
+    <!-- Subtle Radar/HUD Reticle inside Helmet Visor -->
+    <circle cx="120" cy="112" r="68" stroke="#38bdf8" stroke-width="0.5" stroke-dasharray="3 8" stroke-opacity="0.25" />
+    <!-- Small HUD Crosshair in corner of visor -->
+    <path d="M165 78 L173 78 M169 74 L169 82" stroke="#d4a373" stroke-width="1" stroke-opacity="0.6" />
+    <text x="175" y="81" font-family="monospace" font-size="6" fill="#d4a373" opacity="0.75" font-weight="bold">CADET-01</text>
+  </g>
+</svg>

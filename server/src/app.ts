@@ -13,6 +13,7 @@ import examRoutes from './routes/exam.routes';
 import adminRoutes from './routes/admin.routes';
 import attemptRoutes from './routes/attempt.routes';
 import integrityRoutes from './routes/integrity.routes';
+import testsRoutes from './routes/tests';
 import { errorHandler } from './middleware/error.middleware';
 
 const envCandidates = [
@@ -86,6 +87,7 @@ app.use('/api/exams', apiLimiter, examRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/attempts', apiLimiter, attemptRoutes);
 app.use('/api/integrity', apiLimiter, integrityRoutes);
+app.use('/api/tests', apiLimiter, testsRoutes);
 
 async function forwardToDiscord(payload: any) {
   const discordUrl = process.env.DISCORD_WEBHOOK_URL;

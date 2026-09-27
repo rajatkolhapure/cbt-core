@@ -77,6 +77,10 @@ model User {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  assignedTestsCount  Int?     @default(0) @map("assigned_tests_count")
+  attemptedTestsCount Int?     @default(0) @map("attempted_tests_count")
+  accuracy            Float?   @default(0) @map("accuracy")
+
   attempts         Attempt[]
   examAssignments  ExamAssignment[]
   examSessions     ExamSession[]
@@ -231,6 +235,7 @@ model Attempt {
   correctCount    Int?         @map("correct_count")
   incorrectCount  Int?         @map("incorrect_count")
   unansweredCount Int?         @map("unanswered_count")
+  accuracy        Float?       @map("accuracy")
   createdAt       DateTime     @default(now()) @map("created_at")
   updatedAt       DateTime     @updatedAt @map("updated_at")
 

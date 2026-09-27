@@ -22,10 +22,18 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // If unauthorized and not already on /login, can optionally redirect or clear token
-      if (window.location.pathname !== '/login') {
-        localStorage.removeItem('cbt_token');
-        localStorage.removeItem('cbt_user');
+      const url = error.config?.url || '';
+      const isAuthCheck = url.includes('/auth/me');
+      const errorMsg = String(error.response?.data?.message || error.response?.data?.error || '');
+      const isSessionExpired = errorMsg.toLowerCase().includes('expired') || errorMsg.toLowerCase().includes('invalid');
+
+      // Only clear credentials and redirect if session is truly expired or auth validation failed
+      if (isAuthCheck || isSessionExpired) {
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          localStorage.removeItem('cbt_token');
+          localStorage.removeItem('cbt_user');
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
