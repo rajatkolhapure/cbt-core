@@ -139,12 +139,12 @@ export const HomeOverview: React.FC = () => {
     }
   }, [user?.id, authLoading, fetchStudentTelemetry]);
 
-  const tabs: { id: Tab; label: string }[] = [
+  const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'assigned', label: 'Assigned Tests' },
-    { id: 'bookmarked', label: 'Bookmarked' },
+    { id: 'assigned', label: 'Assigned Tests', count: stats.assignedTestsCount },
+    { id: 'bookmarked', label: 'Bookmarked', count: assignedTests.filter((t) => t.bookmarked).length },
     { id: 'upcoming', label: 'Upcoming' },
-    { id: 'history', label: 'History / Given Tests' },
+    { id: 'history', label: 'History / Given Tests', count: stats.attemptedTestsCount },
   ];
 
   const handleLaunchTest = (test: LiveTestItem) => {
@@ -234,18 +234,23 @@ export const HomeOverview: React.FC = () => {
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2 pt-1 font-mono text-xs">
-              {tabs.map(({ id, label }) => (
+              {tabs.map(({ id, label, count }) => (
                 <button
                   key={id}
                   onClick={() => {
                     setTab(id);
                     setMobileMenuOpen(false);
                   }}
-                  className={`p-2 text-left rounded-lg transition ${
+                  className={`inline-flex items-center justify-between p-2 text-left rounded-lg transition ${
                     tab === id ? 'bg-[#C85A32] text-white font-bold' : 'text-[#8791A5] hover:bg-[#1B2438]'
                   }`}
                 >
-                  {label}
+                  <span>{label}</span>
+                  {count !== undefined && count > 0 && (
+                    <span className="rounded-full px-1.5 py-0.5 text-[9px] font-mono font-semibold text-[#D4A373] bg-[#D4A373]/10">
+                      {count}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -253,7 +258,10 @@ export const HomeOverview: React.FC = () => {
         )}
 
         {/* Hero Welcome Banner (Fox AI Cadet widget intentionally removed as requested) */}
-        <section className="py-8 sm:py-10 lg:py-12">
+        <section className="relative py-8 sm:py-10 lg:py-12">
+          {/* Ambient Glow */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-[#C85A32]/10 via-[#38BDF8]/5 to-transparent blur-[120px] pointer-events-none -z-10" />
+
           <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div className="max-w-3xl">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#C85A32]/30 bg-[#C85A32]/10 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[.16em] text-[#E59876]">
@@ -275,7 +283,7 @@ export const HomeOverview: React.FC = () => {
             className="sticky top-0 z-20 -mx-4 mb-6 flex overflow-x-auto border-y border-[#263044] bg-[#0B0F17]/95 px-4 pb-px backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-12 lg:px-12 scrollbar-none"
           >
             <div className="flex min-w-max gap-1">
-              {tabs.map(({ id, label }) => {
+              {tabs.map(({ id, label, count }) => {
                 const isActive = tab === id;
                 return (
                   <button
@@ -283,13 +291,18 @@ export const HomeOverview: React.FC = () => {
                     onClick={() => setTab(id)}
                     aria-selected={isActive}
                     role="tab"
-                    className={`border-b-2 px-4 py-3 font-mono text-[10px] sm:text-xs uppercase tracking-[.13em] transition-all focus:outline-none ${
+                    className={`inline-flex items-center gap-2 border-b-2 px-4 py-3 font-mono text-[10px] sm:text-xs uppercase tracking-[.13em] transition-all focus:outline-none ${
                       isActive
-                        ? 'border-[#C85A32] text-[#F3F4F6] font-bold'
+                        ? 'bg-[#C85A32]/10 text-white border-b-2 border-[#C85A32] font-bold'
                         : 'border-transparent text-[#8791A5] hover:text-white'
                     }`}
                   >
-                    {label}
+                    <span>{label}</span>
+                    {count !== undefined && count > 0 && (
+                      <span className="rounded-full px-1.5 py-0.5 text-[9px] font-mono font-semibold text-[#D4A373] bg-[#D4A373]/10">
+                        {count}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -376,7 +389,7 @@ export const HomeOverview: React.FC = () => {
                     </div>
                     <button
                       onClick={() => handleLaunchTest(test)}
-                      className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#C85A32] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[.16em] text-white transition hover:bg-[#DC6C40] active:translate-y-[1px] shadow-md focus:outline-none focus:ring-2 focus:ring-[#C85A32]/60"
+                      className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#C85A32] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[.16em] text-white transition hover:bg-[#B54E29] active:translate-y-[1px] shadow-md focus:outline-none focus:ring-2 focus:ring-[#C85A32]/60"
                     >
                       <span>Launch test</span>
                       <ArrowRight size={15} />
@@ -415,7 +428,7 @@ export const HomeOverview: React.FC = () => {
                       </div>
                       <button
                         onClick={() => handleLaunchTest(test)}
-                        className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#C85A32] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[.16em] text-white transition hover:bg-[#DC6C40] active:translate-y-[1px] shadow-md"
+                        className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#C85A32] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[.16em] text-white transition hover:bg-[#B54E29] active:translate-y-[1px] shadow-md"
                       >
                         <span>Launch test</span>
                         <ArrowRight size={15} />
@@ -549,7 +562,7 @@ export const HomeOverview: React.FC = () => {
               </button>
               <button
                 onClick={handleEnterArena}
-                className="flex items-center justify-center gap-2 rounded-xl bg-[#C85A32] px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-[#DC6C40] active:translate-y-[1px] shadow-lg shadow-[#C85A32]/25"
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#C85A32] px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-[#B54E29] active:translate-y-[1px] shadow-lg shadow-[#C85A32]/25"
               >
                 <span>Enter Secure Arena</span>
                 <ArrowRight size={15} />

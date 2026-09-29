@@ -3,6 +3,7 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -109,24 +110,37 @@ export const TestScoreGraph: React.FC<TestScoreGraphProps> = ({
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
-              <linearGradient id="rustScoreGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#C85A32" stopOpacity={0.45} />
-                <stop offset="100%" stopColor="#C85A32" stopOpacity={0.0} />
+              <linearGradient id="accuracyGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#C85A32" stopOpacity={0.25} />
+                <stop offset="100%" stopColor="#0B0F17" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="#263044" strokeDasharray="2 5" vertical={false} />
+            <CartesianGrid stroke="#1E293B" strokeDasharray="2 5" vertical={false} />
             <XAxis
               dataKey="displayLabel"
-              tick={{ fill: '#8791A5', fontSize: 10, fontFamily: 'monospace' }}
-              axisLine={{ stroke: '#526078', strokeDasharray: '4 4' }}
+              tick={{ fill: '#64748B', fontSize: 10, fontFamily: 'monospace' }}
+              axisLine={{ stroke: '#1E293B' }}
               tickLine={false}
             />
             <YAxis
               domain={[0, 100]}
-              tick={{ fill: '#8791A5', fontSize: 10, fontFamily: 'monospace' }}
-              axisLine={{ stroke: '#526078', strokeDasharray: '4 4' }}
+              tick={{ fill: '#64748B', fontSize: 10, fontFamily: 'monospace' }}
+              axisLine={{ stroke: '#1E293B' }}
               tickLine={false}
               tickFormatter={(v) => `${v}%`}
+            />
+            <ReferenceLine
+              y={75}
+              stroke="#38BDF8"
+              strokeOpacity={0.4}
+              strokeDasharray="4 4"
+              label={{
+                value: 'BENCHMARK 75%',
+                fill: '#38BDF8',
+                fontSize: 9,
+                fontFamily: 'monospace',
+                position: 'insideTopRight',
+              }}
             />
             <Tooltip
               content={({ active, payload }: { active?: boolean; payload?: any[] }) => {
@@ -154,8 +168,8 @@ export const TestScoreGraph: React.FC<TestScoreGraphProps> = ({
               type="monotone"
               dataKey="score"
               stroke="#C85A32"
-              strokeWidth={3}
-              fill="url(#rustScoreGradient)"
+              strokeWidth={2.5}
+              fill="url(#accuracyGradient)"
             />
           </AreaChart>
         </ResponsiveContainer>

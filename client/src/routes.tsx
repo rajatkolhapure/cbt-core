@@ -18,6 +18,7 @@ import LiveMonitoringPage from './pages/admin/LiveMonitoringPage';
 import StudentLayout from './components/layout/StudentLayout';
 import ExamResultPage from './pages/student/ExamResultPage';
 import ExamPage from './pages/exam/ExamPage';
+import StudentDashboard from './pages/student/StudentDashboard';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -29,8 +30,8 @@ export const AppRoutes: React.FC = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Student Dashboard route also points to the new Space Cadet Homepage */}
-      <Route path="/student/dashboard" element={<HomeOverview />} />
+      {/* Student Dashboard route points to Space Cadet StudentDashboard */}
+      <Route path="/student/dashboard" element={<StudentDashboard />} />
       <Route path="/overview" element={<HomeOverview />} />
 
       {/* Protected Admin Routes */}

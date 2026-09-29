@@ -15,9 +15,20 @@ interface SingleCardProps {
   trend: string;
   tone?: 'muted' | 'good' | 'bad';
   emptyMessage?: string;
+  topBorderClass: string;
+  iconPillClass: string;
 }
 
-function StatItem({ icon: Icon, label, value, trend, tone = 'muted', emptyMessage }: SingleCardProps) {
+function StatItem({
+  icon: Icon,
+  label,
+  value,
+  trend,
+  tone = 'muted',
+  emptyMessage,
+  topBorderClass,
+  iconPillClass,
+}: SingleCardProps) {
   const trendColor =
     tone === 'good'
       ? 'text-[#10B981]'
@@ -27,11 +38,11 @@ function StatItem({ icon: Icon, label, value, trend, tone = 'muted', emptyMessag
 
   return (
     <article
-      className="relative overflow-hidden rounded-2xl border border-[#263044] border-t-[#D4A373]/70 bg-[#151C2C] p-5 shadow-lg transition-transform duration-200 hover:-translate-y-0.5 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-[#D4A373] before:to-transparent"
+      className={`relative overflow-hidden rounded-2xl border border-[#263044] ${topBorderClass} bg-[#151C2C] p-5 shadow-lg transition-transform duration-200 hover:-translate-y-0.5`}
       aria-label={`${label}: ${value}`}
     >
       <div className="flex items-start justify-between">
-        <div className="grid size-9 place-items-center rounded-lg bg-[#C85A32]/10 text-[#D4A373]">
+        <div className={`grid size-9 place-items-center rounded-lg ${iconPillClass}`}>
           <Icon size={17} />
         </div>
         <span className={`font-mono text-[10px] uppercase tracking-wider ${trendColor}`}>
@@ -88,42 +99,52 @@ export const StudentStatsCard: React.FC<StudentStatsCardsGridProps> = ({ stats, 
       ? '0%'
       : `${Number(stats.accuracy).toFixed(stats.accuracy % 1 === 0 ? 0 : 2)}%`;
 
+  const isAccuracyGood = stats.accuracy >= 60;
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {/* 1. Assigned Tests */}
+      {/* Card 1 (Assigned Tests) */}
       <StatItem
         icon={FileText}
         label="ASSIGNED TESTS"
         value={assignedDisplay}
         trend="LIVE DB SYNC"
+        topBorderClass="border-t-2 border-[#D4A373]"
+        iconPillClass="bg-[#D4A373]/10 text-[#D4A373]"
         emptyMessage={stats.assignedTestsCount === 0 ? 'No papers currently assigned' : undefined}
       />
 
-      {/* 2. Tests Attempted */}
+      {/* Card 2 (Tests Attempted) */}
       <StatItem
         icon={BookOpen}
         label="TESTS ATTEMPTED"
         value={stats.attemptedTestsCount}
         trend={stats.attemptedTestsCount > 0 ? `↑ ${stats.attemptedTestsCount} COMPLETED` : 'PENDING START'}
         tone={stats.attemptedTestsCount > 0 ? 'good' : 'muted'}
+        topBorderClass="border-t-2 border-[#38BDF8]"
+        iconPillClass="bg-[#38BDF8]/10 text-[#38BDF8]"
         emptyMessage={stats.attemptedTestsCount === 0 ? 'Start your first test below' : undefined}
       />
 
-      {/* 3. Average Question Accuracy */}
+      {/* Card 3 (Avg. Accuracy) */}
       <StatItem
         icon={Target}
         label="AVG. ACCURACY"
         value={accuracyDisplay}
         trend={stats.accuracy >= 75 ? '↑ HIGH MASTERY' : stats.accuracy >= 40 ? '• NOMINAL' : 'CALIBRATING'}
-        tone={stats.accuracy >= 60 ? 'good' : stats.accuracy > 0 ? 'bad' : 'muted'}
+        tone={isAccuracyGood ? 'good' : stats.accuracy > 0 ? 'bad' : 'muted'}
+        topBorderClass={isAccuracyGood ? 'border-t-2 border-[#10B981]' : 'border-t-2 border-amber-500/80'}
+        iconPillClass={isAccuracyGood ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}
       />
 
-      {/* 4. Questions Practiced */}
+      {/* Card 4 (Questions Practiced) */}
       <StatItem
         icon={Crosshair}
         label="QUESTIONS PRACTICED"
         value={stats.questionsPracticedCount}
         trend="AUTHENTICATED CBT"
+        topBorderClass="border-t-2 border-[#C85A32]"
+        iconPillClass="bg-[#C85A32]/10 text-[#C85A32]"
       />
     </div>
   );
