@@ -29,6 +29,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Question Bank', path: '/admin/questions', icon: HelpCircle },
     { label: 'Exam Builder', path: '/admin/exams', icon: FileSpreadsheet },
     { label: 'Students', path: '/admin/students', icon: Users },
+    { label: 'Assign Test', path: '/admin/assign-test', icon: FileSpreadsheet },
     { label: 'Results & Analytics', path: '/admin/results', icon: BarChart3 },
     { label: 'Integrity Logs', path: '/admin/integrity', icon: ShieldAlert },
   ];

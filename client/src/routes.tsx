@@ -19,6 +19,7 @@ import StudentLayout from './components/layout/StudentLayout';
 import ExamResultPage from './pages/student/ExamResultPage';
 import ExamPage from './pages/exam/ExamPage';
 import StudentDashboard from './pages/student/StudentDashboard';
+import AssignTest from './pages/AssignTest';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -33,6 +34,7 @@ export const AppRoutes: React.FC = () => {
       {/* Student Dashboard route points to Space Cadet StudentDashboard */}
       <Route path="/student/dashboard" element={<StudentDashboard />} />
       <Route path="/overview" element={<HomeOverview />} />
+      <Route path="/assign-test" element={<AssignTest />} />
 
       {/* Protected Admin Routes */}
       <Route element={<ProtectedRoute requiredRole="ADMIN" />}>
@@ -42,6 +44,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="questions" element={<QuestionBankPage />} />
           <Route path="exams" element={<ExamManagementPage />} />
           <Route path="students" element={<StudentManagementPage />} />
+          <Route path="assign-test" element={<AssignTest />} />
           <Route path="results" element={<ResultsAnalyticsPage />} />
           <Route path="integrity" element={<IntegrityLogsPage />} />
         </Route>

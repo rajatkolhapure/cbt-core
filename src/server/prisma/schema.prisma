@@ -169,6 +169,7 @@ model Exam {
   scheduledEnd      DateTime?       @map("scheduled_end")
   createdAt         DateTime        @default(now()) @map("created_at")
   updatedAt         DateTime        @updatedAt @map("updated_at")
+  completedAt       DateTime?       @map("completed_at")
 
   sections      ExamSection[]
   assignments   ExamAssignment[]
@@ -218,8 +219,9 @@ model ExamAssignment {
   id         String           @id @default(uuid())
   examId     String           @map("exam_id")
   userId     String           @map("user_id")
-  status     AssignmentStatus @default(pending)
-  assignedAt DateTime         @default(now()) @map("assigned_at")
+  status      AssignmentStatus @default(pending)
+  assignedAt  DateTime         @default(now()) @map("assigned_at")
+  completedAt DateTime?        @map("completed_at")
 
   exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

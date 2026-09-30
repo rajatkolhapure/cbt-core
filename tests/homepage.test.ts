@@ -239,3 +239,89 @@ describe('Live DB Telemetry & Student Analytics Requirements', () => {
   });
 });
 
+describe('Assignable Tests Filtering & AssignTest Space Cadet Page', () => {
+  const { filterAssignableTests } = require('../server/src/services/testService');
+
+  test('testService.filterAssignableTests excludes records where completedAt is set', () => {
+    const mockTests = [
+      { id: '1', title: 'Calculus I', status: 'PENDING', completedAt: null },
+      { id: '2', title: 'Kinematics', status: 'PENDING', completedAt: new Date().toISOString() },
+      { id: '3', title: 'Optics', status: 'PENDING', completedAt: '2026-09-30T10:00:00.000Z' },
+      { id: '4', title: 'Thermodynamics', status: 'PENDING', completedAt: null },
+    ];
+
+    const filtered = filterAssignableTests(mockTests);
+    assert.equal(filtered.length, 2, 'Should only return tests where completedAt is null');
+    assert.deepEqual(filtered.map((t: any) => t.id), ['1', '4']);
+    assert.ok(filtered.every((t: any) => t.completedAt === null), 'Returned tests must have completedAt == null');
+  });
+
+  test('testService.filterAssignableTests excludes records where status === "COMPLETED"', () => {
+    const mockTests = [
+      { id: '1', title: 'Organic Chemistry', status: 'PENDING', completedAt: null },
+      { id: '2', title: 'Inorganic Chemistry', status: 'COMPLETED', completedAt: null },
+      { id: '3', title: 'Physical Chemistry', status: 'completed', completedAt: null },
+      { id: '4', title: 'Biochemistry', status: 'PENDING', completedAt: null },
+    ];
+
+    const filtered = filterAssignableTests(mockTests);
+    assert.equal(filtered.length, 2, 'Should exclude COMPLETED and completed statuses');
+    assert.deepEqual(filtered.map((t: any) => t.id), ['1', '4']);
+    assert.ok(filtered.every((t: any) => t.status === 'PENDING'));
+  });
+
+  test('testService.filterAssignableTests returns empty list when all tests are completed', () => {
+    const mockTests = [
+      { id: '1', title: 'Test 1', status: 'COMPLETED', completedAt: new Date() },
+      { id: '2', title: 'Test 2', status: 'COMPLETED', completedAt: null },
+      { id: '3', title: 'Test 3', status: 'PENDING', completedAt: new Date() },
+    ];
+
+    const filtered = filterAssignableTests(mockTests);
+    assert.equal(filtered.length, 0, 'Should return empty array when no pending tests are available');
+  });
+
+  test('Targeted AssignTest.tsx, api/tests.ts, and testService.ts files exist', () => {
+    const clientAssignPage = path.resolve(__dirname, '../client/src/pages/AssignTest.tsx');
+    const rootAssignPage = path.resolve(__dirname, '../src/pages/AssignTest.tsx');
+    const clientApiTests = path.resolve(__dirname, '../client/src/api/tests.ts');
+    const rootApiTests = path.resolve(__dirname, '../src/api/tests.ts');
+    const serverService = path.resolve(__dirname, '../server/src/services/testService.ts');
+    const rootService = path.resolve(__dirname, '../src/services/testService.ts');
+
+    assert.ok(fs.existsSync(clientAssignPage), 'client/src/pages/AssignTest.tsx must exist');
+    assert.ok(fs.existsSync(rootAssignPage), 'src/pages/AssignTest.tsx must exist');
+    assert.ok(fs.existsSync(clientApiTests), 'client/src/api/tests.ts must exist');
+    assert.ok(fs.existsSync(rootApiTests), 'src/api/tests.ts must exist');
+    assert.ok(fs.existsSync(serverService), 'server/src/services/testService.ts must exist');
+    assert.ok(fs.existsSync(rootService), 'src/services/testService.ts must exist');
+  });
+
+  test('AssignTest.tsx complies strictly with Space Cadet theme and mobile KaTeX safety', () => {
+    const pageContent = fs.readFileSync(path.resolve(__dirname, '../client/src/pages/AssignTest.tsx'), 'utf8');
+
+    // Space Cadet tokens
+    assert.ok(pageContent.includes('bg-[#151C2C]'), 'Cards must use Space Cadet background bg-[#151C2C]');
+    assert.ok(pageContent.includes('bg-[#C85A32]'), 'CTA button must use Space Cadet terracotta bg-[#C85A32]');
+    assert.ok(pageContent.includes('text-[#D4A373]'), 'Telemetry accents must use text-[#D4A373]');
+    assert.ok(pageContent.includes('bg-[#0B0F17]'), 'Page background must use Space Cadet void bg-[#0B0F17]');
+    assert.ok(pageContent.includes('active:translate-y-[1px]'), 'CTA button must have active:translate-y-[1px]');
+
+    // Graceful fallback for completed tests
+    assert.ok(pageContent.includes('opacity-50') && pageContent.includes('cursor-not-allowed'), 'Must render completed tests as disabled fallback');
+
+    // No prohibited generic colors
+    assert.ok(!pageContent.includes('from-purple-'), 'Must not contain generic purple gradients');
+    assert.ok(!pageContent.includes('from-indigo-'), 'Must not contain generic indigo gradients');
+
+    // Mobile KaTeX responsiveness
+    assert.ok(pageContent.includes('max-w-full') && pageContent.includes('overflow-x-auto'), 'KaTeX container must be max-w-full with overflow-x-auto for mobile safety');
+  });
+
+  test('server/src/routes/tests.ts exposes /assignable endpoint with testService', () => {
+    const testsContent = fs.readFileSync(path.resolve(__dirname, '../server/src/routes/tests.ts'), 'utf8');
+    assert.ok(testsContent.includes('/assignable'), 'tests.ts must define /assignable route');
+    assert.ok(testsContent.includes('getAssignableTests'), 'tests.ts must query getAssignableTests');
+  });
+});
+

@@ -2,6 +2,7 @@ import { Router, type Response, type NextFunction } from 'express';
 import prisma from '../config/database';
 import { requireAuth, type AuthRequest } from '../middleware/auth.middleware';
 import { AttemptState, AssignmentStatus } from '@prisma/client';
+import testService from '../services/testService';
 
 const router = Router();
 
@@ -268,14 +269,17 @@ router.post('/complete', async (req: AuthRequest, res: Response, next: NextFunct
     }
 
     // Guard: already completed → 400
-    if (assignment.status === AssignmentStatus.completed) {
+    if (assignment.status === AssignmentStatus.completed || assignment.completedAt !== null) {
       return res.status(400).json({ error: 'Test already completed' });
     }
 
-    // Mark as completed
+    // Mark as completed with timestamp
     await prisma.examAssignment.update({
       where: { examId_userId: { examId, userId } },
-      data: { status: AssignmentStatus.completed },
+      data: {
+        status: AssignmentStatus.completed,
+        completedAt: new Date(),
+      },
     });
 
     // Return the updated (now-filtered) list so the UI can refresh without an extra request
@@ -309,13 +313,34 @@ router.get('/resume-check/:examId', async (req: AuthRequest, res: Response, next
       return res.status(404).json({ error: 'Assignment not found for this candidate' });
     }
 
-    if (assignment.status === AssignmentStatus.completed) {
+    if (assignment.status === AssignmentStatus.completed || assignment.completedAt !== null) {
       return res.status(400).json({ error: 'Test already completed' });
     }
 
     return res.json({ success: true, status: assignment.status, canResume: true });
   } catch (error) {
     console.error('[API GET /api/tests/resume-check] Error:', error);
+    next(error);
+  }
+});
+
+/**
+ * GET /api/tests/assignable
+ *
+ * Returns only pending tests where completedAt is null and status !== 'COMPLETED'.
+ * Filters out any completed tests or tests with completedAt set.
+ */
+router.get('/assignable', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId || req.user?.id;
+    const tests = await testService.getAssignableTests(userId);
+    return res.json({
+      success: true,
+      tests,
+      assignableTests: tests,
+    });
+  } catch (error) {
+    console.error('[API GET /api/tests/assignable] Error:', error);
     next(error);
   }
 });
