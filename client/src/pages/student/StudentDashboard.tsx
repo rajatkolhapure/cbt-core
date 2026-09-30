@@ -648,7 +648,7 @@ export const StudentDashboard: React.FC = () => {
                         )}
                       </div>
                       <h2 className="text-lg font-bold text-[#F3F4F6]">{test.name}</h2>
-                      <div className="text-xs text-[#D4A373] font-mono py-1">
+                      <div className="text-xs text-[#D4A373] font-mono py-1 overflow-visible break-words">
                         <MathRenderer content={test.formula} />
                       </div>
                       <div className="flex flex-wrap gap-2.5 font-mono text-[9px] uppercase tracking-wider text-[#8791A5]">
@@ -702,7 +702,7 @@ export const StudentDashboard: React.FC = () => {
                           <span className="text-[#D4A373]">Bookmarked Priority</span>
                         </div>
                         <h2 className="text-lg font-bold text-[#F3F4F6]">{test.name}</h2>
-                        <div className="text-xs text-[#D4A373] font-mono py-1">
+                        <div className="text-xs text-[#D4A373] font-mono py-1 overflow-visible break-words">
                           <MathRenderer content={test.formula} />
                         </div>
                       </div>
@@ -810,7 +810,7 @@ export const StudentDashboard: React.FC = () => {
               <p className="font-mono text-[10px] uppercase text-[#D4A373]">
                 TARGET EXAM: {selectedTest.name}
               </p>
-              <div className="mt-1 text-xs text-[#AEB6C5]">
+              <div className="mt-1 text-xs text-[#AEB6C5] overflow-visible break-words">
                 <MathRenderer content={selectedTest.formula} />
               </div>
             </div>

@@ -35,7 +35,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({
         if (part.startsWith('$$') && part.endsWith('$$')) {
           const math = part.slice(2, -2).trim();
           const wrapper = document.createElement('div');
-          wrapper.className = 'my-2 max-w-full overflow-x-auto py-1 text-center scrollbar-thin';
+          wrapper.className = 'my-2 max-w-full overflow-visible py-1 text-center break-words whitespace-normal';
           try {
             katex.render(math, wrapper, {
               displayMode: true,
@@ -50,7 +50,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({
         } else if (part.startsWith('$') && part.endsWith('$')) {
           const math = part.slice(1, -1).trim();
           const span = document.createElement('span');
-          span.className = 'inline-block max-w-full overflow-x-auto align-baseline';
+          span.className = 'inline-block max-w-full overflow-visible align-baseline break-words whitespace-normal';
           try {
             katex.render(math, span, {
               displayMode: false,
@@ -78,7 +78,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`break-words max-w-full ${inline ? 'inline' : 'inline-block'} ${className}`}
+      className={`break-words whitespace-normal max-w-full overflow-visible ${inline ? 'inline' : 'inline-block'} ${className}`}
     />
   );
 };

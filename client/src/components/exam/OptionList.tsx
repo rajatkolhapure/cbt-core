@@ -82,7 +82,7 @@ export const OptionList: React.FC<OptionListProps> = ({
               </span>
 
               {/* Math / Option Content */}
-              <div className={`flex-1 min-w-0 ${fontSizeClass} leading-relaxed break-words overflow-x-auto pt-0.5`}>
+              <div className={`flex-1 min-w-0 ${fontSizeClass} leading-relaxed break-words overflow-visible pt-0.5`}>
                 <MathRenderer content={option} />
               </div>
             </div>

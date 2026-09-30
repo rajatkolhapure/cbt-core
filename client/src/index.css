@@ -144,6 +144,29 @@
   background: #575A65;
 }
 
+/* KaTeX & Math Equations: Eliminate scroll slider & allow natural expansion */
+.katex,
+.katex-display,
+.katex-html,
+.math-renderer,
+[data-katex] {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  white-space: normal !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.katex::-webkit-scrollbar,
+.katex-display::-webkit-scrollbar,
+.katex-html::-webkit-scrollbar,
+.math-renderer::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* Snappy Animations */
 @keyframes technicalPulse {
   0%, 100% { opacity: 1; transform: scale(1); }

@@ -78,6 +78,18 @@ describe('KaTeX Mathematical Rendering Verification', () => {
     });
     assert.ok(output.length > 0, 'Must produce fallback output without crashing');
   });
+
+  test('MathRenderer and QuestionRenderer eliminate scroll slider and use overflow-visible', () => {
+    const mathRendererPath = path.resolve(__dirname, '../client/src/components/common/MathRenderer.tsx');
+    const mathContent = fs.readFileSync(mathRendererPath, 'utf8');
+
+    assert.ok(mathContent.includes('overflow-visible'), 'MathRenderer must apply overflow-visible');
+    assert.ok(!mathContent.includes('overflow-x-auto'), 'MathRenderer must not apply overflow-x-auto to math spans or wrappers');
+
+    const cssPath = path.resolve(__dirname, '../client/src/index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+    assert.ok(cssContent.includes('.katex') && cssContent.includes('scrollbar-width: none'), 'CSS must suppress scrollbars on math elements');
+  });
 });
 
 describe('Sliding Buffer & Redundant Neon DB Avoidance', () => {
