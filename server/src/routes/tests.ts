@@ -1,7 +1,7 @@
 import { Router, type Response, type NextFunction } from 'express';
 import prisma from '../config/database';
 import { requireAuth, type AuthRequest } from '../middleware/auth.middleware';
-import { AttemptState } from '@prisma/client';
+import { AttemptState, AssignmentStatus } from '@prisma/client';
 
 const router = Router();
 
@@ -182,5 +182,142 @@ const getStudentStatsHandler = async (req: AuthRequest, res: Response, next: Nex
 
 router.get('/', getStudentStatsHandler);
 router.get('/student-stats', getStudentStatsHandler);
+
+/**
+ * Helper: build the standard assigned-tests list response shape.
+ * Filters out completed assignments so completed tests vanish from the UI.
+ */
+const buildAssignedTestsList = async (userId: string) => {
+  const assignments = await prisma.examAssignment.findMany({
+    where: {
+      userId,
+      status: { not: AssignmentStatus.completed },
+    },
+    include: {
+      exam: {
+        select: {
+          id: true,
+          title: true,
+          duration: true,
+          examEnvironment: true,
+          sections: {
+            select: { id: true, name: true, questionCount: true },
+          },
+        },
+      },
+    },
+    orderBy: { assignedAt: 'desc' },
+  });
+
+  return assignments.map(({ exam, status }) => {
+    const qCount = exam.sections.reduce((acc, s) => acc + s.questionCount, 0);
+    return {
+      id: exam.id,
+      name: exam.title,
+      track: exam.sections[0]?.name ? `${exam.sections[0].name} Track` : 'Standard Academic Track',
+      duration: `${exam.duration}M`,
+      questionsCount: qCount || 25,
+      format: exam.examEnvironment === 'FULLSCREEN_BROWSER' ? 'CBT-STRICT' : 'STANDARD',
+      formula: 'Calculus & Kinetics Verification: $\\nabla \\cdot \\vec{E} = \\frac{\\rho}{\\varepsilon_0}$',
+      status,
+    };
+  });
+};
+
+/**
+ * GET /api/tests/assigned
+ *
+ * Returns only non-completed assigned tests for the authenticated student.
+ * Used by the Resume Test CTA section on the Student Dashboard.
+ */
+router.get('/assigned', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId || req.user?.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized candidate session' });
+
+    const assignedTests = await buildAssignedTestsList(userId);
+    return res.json({ success: true, assignedTests });
+  } catch (error) {
+    console.error('[API GET /api/tests/assigned] Error:', error);
+    next(error);
+  }
+});
+
+/**
+ * POST /api/tests/complete
+ * Body: { examId: string }
+ *
+ * Marks an ExamAssignment as completed. If it is already completed, returns 400.
+ * On success, also returns the updated list of remaining non-completed tests.
+ */
+router.post('/complete', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId || req.user?.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized candidate session' });
+
+    const { examId } = req.body as { examId?: string };
+    if (!examId) return res.status(400).json({ error: 'examId is required' });
+
+    // Find the assignment
+    const assignment = await prisma.examAssignment.findUnique({
+      where: { examId_userId: { examId, userId } },
+    });
+
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found for this candidate' });
+    }
+
+    // Guard: already completed → 400
+    if (assignment.status === AssignmentStatus.completed) {
+      return res.status(400).json({ error: 'Test already completed' });
+    }
+
+    // Mark as completed
+    await prisma.examAssignment.update({
+      where: { examId_userId: { examId, userId } },
+      data: { status: AssignmentStatus.completed },
+    });
+
+    // Return the updated (now-filtered) list so the UI can refresh without an extra request
+    const assignedTests = await buildAssignedTestsList(userId);
+    return res.json({ success: true, assignedTests });
+  } catch (error) {
+    console.error('[API POST /api/tests/complete] Error:', error);
+    next(error);
+  }
+});
+
+/**
+ * GET /api/tests/resume-check/:examId
+ *
+ * Validates that an exam is still resumable for the authenticated student.
+ * Returns 400 with "Test already completed" if the assignment is completed.
+ * Used client-side before navigating to the exam page when the user clicks "Resume Test".
+ */
+router.get('/resume-check/:examId', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId || req.user?.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized candidate session' });
+
+    const { examId } = req.params;
+
+    const assignment = await prisma.examAssignment.findUnique({
+      where: { examId_userId: { examId, userId } },
+    });
+
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found for this candidate' });
+    }
+
+    if (assignment.status === AssignmentStatus.completed) {
+      return res.status(400).json({ error: 'Test already completed' });
+    }
+
+    return res.json({ success: true, status: assignment.status, canResume: true });
+  } catch (error) {
+    console.error('[API GET /api/tests/resume-check] Error:', error);
+    next(error);
+  }
+});
 
 export default router;

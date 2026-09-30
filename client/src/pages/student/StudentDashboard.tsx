@@ -31,6 +31,7 @@ import {
 import api from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
 import MathRenderer from '../../components/common/MathRenderer';
+import AssignedTests from '../../components/AssignedTests';
 
 type Tab = 'overview' | 'assigned' | 'bookmarked' | 'upcoming' | 'history';
 
@@ -618,65 +619,12 @@ export const StudentDashboard: React.FC = () => {
 
           {/* TAB: ASSIGNED TESTS */}
           {tab === 'assigned' && (
-            <div className="mt-6 space-y-4">
-              {assignedTests.length === 0 ? (
-                <div className="rounded-2xl border border-[#263044] bg-[#151C2C] p-12 text-center">
-                  <FileText size={36} className="mx-auto text-[#8791A5] mb-3" />
-                  <h3 className="text-lg font-bold text-white">0 Assigned Tests</h3>
-                  <p className="text-xs text-[#8791A5] mt-1">
-                    No examination dockets are currently assigned to your candidate profile.
-                  </p>
-                </div>
-              ) : (
-                assignedTests.map((test, index) => (
-                  <article
-                    key={test.id}
-                    className={`flex flex-col gap-5 rounded-2xl border border-[#263044] bg-[#151C2C] p-5 sm:flex-row sm:items-center sm:justify-between shadow-lg ${
-                      index === 0 ? 'border-l-4 border-l-[#C85A32]' : ''
-                    }`}
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.18em] text-[#C85A32]">
-                        <span>Paper 0{index + 1}</span>
-                        <span className="text-[#526078]">/</span>
-                        <span>{test.track}</span>
-                        {test.bookmarked && (
-                          <>
-                            <span className="text-[#526078]">/</span>
-                            <span className="text-[#D4A373]">Bookmarked</span>
-                          </>
-                        )}
-                      </div>
-                      <h2 className="text-lg font-bold text-[#F3F4F6]">{test.name}</h2>
-                      <div className="text-xs text-[#D4A373] font-mono py-1 overflow-visible break-words">
-                        <MathRenderer content={test.formula} />
-                      </div>
-                      <div className="flex flex-wrap gap-2.5 font-mono text-[9px] uppercase tracking-wider text-[#8791A5]">
-                        <span className="bg-[#111724] border border-[#263044] px-2 py-0.5 rounded">
-                          [FORMAT: {test.format}]
-                        </span>
-                        <span className="bg-[#111724] border border-[#263044] px-2 py-0.5 rounded">
-                          [ENCRYPTION: SECURE]
-                        </span>
-                        <span className="bg-[#111724] border border-[#263044] px-2 py-0.5 rounded">
-                          [DURATION: {test.duration}]
-                        </span>
-                        <span className="bg-[#111724] border border-[#263044] px-2 py-0.5 rounded">
-                          [QUESTIONS: {test.questionsCount}]
-                        </span>
-                      </div>
-                    </div>
-                    {/* Primary Action Button */}
-                    <button
-                      onClick={() => handleLaunchTest(test)}
-                      className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#C85A32] hover:bg-[#B54E29] text-white px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[.16em] transition active:translate-y-[1px] shadow-md focus:outline-none focus:ring-2 focus:ring-[#C85A32]/60"
-                    >
-                      <span>Launch test</span>
-                      <ArrowRight size={15} />
-                    </button>
-                  </article>
-                ))
-              )}
+            <div className="mt-6">
+              <AssignedTests
+                tests={assignedTests}
+                isLoading={isLoading}
+                onListChange={(updated) => setAssignedTests(updated)}
+              />
             </div>
           )}
 

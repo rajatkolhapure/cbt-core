@@ -27,6 +27,12 @@ enum AttemptState {
   EVALUATED
 }
 
+enum AssignmentStatus {
+  pending
+  in_progress
+  completed
+}
+
 enum Difficulty {
   EASY
   MEDIUM
@@ -77,9 +83,9 @@ model User {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  assignedTestsCount  Int      @default(0) @map("assigned_tests_count")
-  attemptedTestsCount Int      @default(0) @map("attempted_tests_count")
-  accuracy            Float    @default(0) @map("accuracy")
+  assignedTestsCount  Int?     @default(0) @map("assigned_tests_count")
+  attemptedTestsCount Int?     @default(0) @map("attempted_tests_count")
+  accuracy            Float?   @default(0) @map("accuracy")
 
   attempts         Attempt[]
   examAssignments  ExamAssignment[]
@@ -209,10 +215,11 @@ model ExamQuestion {
 }
 
 model ExamAssignment {
-  id         String   @id @default(uuid())
-  examId     String   @map("exam_id")
-  userId     String   @map("user_id")
-  assignedAt DateTime @default(now()) @map("assigned_at")
+  id         String           @id @default(uuid())
+  examId     String           @map("exam_id")
+  userId     String           @map("user_id")
+  status     AssignmentStatus @default(pending)
+  assignedAt DateTime         @default(now()) @map("assigned_at")
 
   exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
