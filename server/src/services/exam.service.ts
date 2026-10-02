@@ -1,3 +1,4 @@
+import { AttemptState } from '@prisma/client';
 import prisma from '../config/database';
 import { AppError } from '../middleware/error.middleware';
 import type { CreateExamInput, UpdateExamInput } from '../validators/exam.validators';
@@ -26,44 +27,51 @@ export class ExamService {
       });
     }
 
-    // Student view: list published exams assigned to the student
-    const assignments = await prisma.examAssignment.findMany({
-      where: { userId: user.userId },
-      include: {
-        exam: {
-          include: {
-            sections: {
-              include: {
-                subject: { select: { id: true, name: true, code: true } },
-              },
-              orderBy: { order: 'asc' },
-            },
-            attempts: {
-              where: { userId: user.userId },
-              select: {
-                id: true,
-                state: true,
-                startedAt: true,
-                submittedAt: true,
-                totalMarks: true,
-                marksObtained: true,
-                percentage: true,
-              },
-              orderBy: { createdAt: 'desc' },
-              take: 1,
-            },
-            _count: {
-              select: { examQuestions: true },
+    // Student view: list published exams assigned to the student, excluding completed/evaluated attempts
+    return prisma.exam.findMany({
+      where: {
+        isPublished: true,
+        assignments: {
+          some: {
+            userId: user.userId,
+          },
+        },
+        attempts: {
+          none: {
+            userId: user.userId,
+            state: {
+              in: [AttemptState.SUBMITTED, AttemptState.EVALUATED],
             },
           },
         },
       },
-      orderBy: { assignedAt: 'desc' },
+      include: {
+        sections: {
+          include: {
+            subject: { select: { id: true, name: true, code: true } },
+          },
+          orderBy: { order: 'asc' },
+        },
+        attempts: {
+          where: { userId: user.userId },
+          select: {
+            id: true,
+            state: true,
+            startedAt: true,
+            submittedAt: true,
+            totalMarks: true,
+            marksObtained: true,
+            percentage: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+        _count: {
+          select: { examQuestions: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
     });
-
-    return assignments
-      .map((a) => a.exam)
-      .filter((exam) => exam.isPublished);
   }
 
   async getExamById(id: string, user: { userId: string; role: string }) {
