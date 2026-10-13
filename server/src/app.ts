@@ -87,61 +87,28 @@ app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/attempts', apiLimiter, attemptRoutes);
 app.use('/api/integrity', apiLimiter, integrityRoutes);
 
-async function forwardToDiscord(payload: any) {
-  const discordUrl = process.env.DISCORD_WEBHOOK_URL;
-  if (!discordUrl) return;
+import { webhookDispatcher, verifyHmacSignature } from './services/webhookDispatcher.service';
 
-  const { event, attemptId, data, integrityFlags, message } = payload;
-  const isSuspicious =
-    integrityFlags?.screenExited ||
-    integrityFlags?.fullscreenExited ||
-    (integrityFlags?.cheatingFlags && Object.keys(integrityFlags.cheatingFlags).length > 0);
+app.post('/api/webhooks', apiLimiter, async (req, res) => {
+  const secret = process.env.WEBHOOK_SECRET;
+  if (secret) {
+    const signature =
+      (req.headers['x-signature-sha256'] as string) ||
+      (req.headers['x-hub-signature-256'] as string) ||
+      (req.headers['x-signature-256'] as string);
 
-  const cheatingList =
-    integrityFlags?.cheatingFlags && Object.keys(integrityFlags.cheatingFlags).length > 0
-      ? Object.keys(integrityFlags.cheatingFlags).join(', ')
-      : 'None';
-
-  const embedFields = [
-    { name: 'Attempt ID', value: attemptId ? `\`${attemptId}\`` : 'N/A', inline: true },
-    { name: 'Device Type', value: integrityFlags?.deviceType || 'unknown', inline: true },
-    { name: 'Screen Exited', value: integrityFlags?.screenExited ? '⚠️ Yes' : '✅ No', inline: true },
-    { name: 'Fullscreen Exited', value: integrityFlags?.fullscreenExited ? '⚠️ Yes' : '✅ No', inline: true },
-    { name: 'Cheating Flags', value: cheatingList, inline: false },
-  ];
-
-  if (message || data?.message) {
-    embedFields.push({ name: 'Details', value: String(message || data?.message), inline: false });
+    if (!signature || !verifyHmacSignature(req.body, signature, secret)) {
+      res.status(401).json({ error: 'Unauthorized: Invalid or missing HMAC signature' });
+      return;
+    }
   }
-
-  const discordBody = {
-    username: 'CBT Integrity Monitor',
-    avatar_url: 'https://cdn-icons-png.flaticon.com/512/2092/2092663.png',
-    embeds: [
-      {
-        title: `${isSuspicious ? '🚨' : 'ℹ️'} Integrity Alert: ${event || 'Event Triggered'}`,
-        color: isSuspicious ? 15158332 : 3447003,
-        fields: embedFields,
-        timestamp: new Date().toISOString(),
-        footer: { text: 'CBT Anti-Cheat Realtime Proctoring' },
-      },
-    ],
-  };
 
   try {
-    await fetch(discordUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(discordBody),
-    });
-  } catch (err) {
-    console.warn('Failed to forward webhook to Discord:', err);
+    const dispatchReport = await webhookDispatcher.dispatchAll(req.body);
+    res.status(200).json({ status: 'ok', received: req.body, dispatchReport });
+  } catch (error: any) {
+    res.status(500).json({ error: error?.message || 'Failed to dispatch webhooks' });
   }
-}
-
-app.post('/api/webhooks', apiLimiter, (req, res) => {
-  forwardToDiscord(req.body).catch(() => {});
-  res.status(200).json({ status: 'ok', received: req.body });
 });
 
 // Static assets & SPA fallback (serves built React frontend from client/dist)
