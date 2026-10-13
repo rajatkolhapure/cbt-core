@@ -24,7 +24,6 @@ const envCandidates = [
 for (const envPath of envCandidates) {
   if (fs.existsSync(envPath)) {
     dotenv.config({ path: envPath });
-    break;
   }
 }
 
@@ -87,6 +86,30 @@ app.use('/api/exams', apiLimiter, examRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/attempts', apiLimiter, attemptRoutes);
 app.use('/api/integrity', apiLimiter, integrityRoutes);
+
+import { webhookDispatcher, verifyHmacSignature } from './services/webhookDispatcher.service';
+
+app.post('/api/webhooks', apiLimiter, async (req, res) => {
+  const secret = process.env.WEBHOOK_SECRET;
+  if (secret) {
+    const signature =
+      (req.headers['x-signature-sha256'] as string) ||
+      (req.headers['x-hub-signature-256'] as string) ||
+      (req.headers['x-signature-256'] as string);
+
+    if (!signature || !verifyHmacSignature(req.body, signature, secret)) {
+      res.status(401).json({ error: 'Unauthorized: Invalid or missing HMAC signature' });
+      return;
+    }
+  }
+
+  try {
+    const dispatchReport = await webhookDispatcher.dispatchAll(req.body);
+    res.status(200).json({ status: 'ok', received: req.body, dispatchReport });
+  } catch (error: any) {
+    res.status(500).json({ error: error?.message || 'Failed to dispatch webhooks' });
+  }
+});
 
 // Static assets & SPA fallback (serves built React frontend from client/dist)
 const clientDistPath = path.resolve(__dirname, '../../client/dist');
