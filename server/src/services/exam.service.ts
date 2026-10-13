@@ -307,39 +307,43 @@ export class ExamService {
       throw new AppError(404, 'Exam not found');
     }
 
-    // Verify all students exist and have STUDENT role
-    const students = await prisma.user.findMany({
-      where: {
-        id: { in: studentIds },
-        role: 'STUDENT',
-      },
-    });
-
-    const validStudentIds = students.map((s) => s.id);
-
-    // Upsert assignments
-    const assignments = await Promise.all(
-      validStudentIds.map((userId) =>
-        prisma.examAssignment.upsert({
-          where: {
-            examId_userId: {
-              examId,
-              userId,
-            },
-          },
-          update: {},
-          create: {
-            examId,
-            userId,
-          },
+    // Validate requested student IDs
+    const validStudents = studentIds.length > 0
+      ? await prisma.user.findMany({
+          where: { id: { in: studentIds }, role: 'STUDENT' },
+          select: { id: true },
         })
-      )
-    );
+      : [];
 
-    return {
-      assignedCount: assignments.length,
-      assignedUserIds: validStudentIds,
-    };
+    const validStudentIds = validStudents.map((s) => s.id);
+
+    return prisma.$transaction(async (tx) => {
+      // Upsert all valid students in the new list
+      if (validStudentIds.length > 0) {
+        await Promise.all(
+          validStudentIds.map((userId) =>
+            tx.examAssignment.upsert({
+              where: { examId_userId: { examId, userId } },
+              update: {},
+              create: { examId, userId },
+            })
+          )
+        );
+      }
+
+      // Delete assignments for students NOT in the new list
+      await tx.examAssignment.deleteMany({
+        where: {
+          examId,
+          userId: { notIn: validStudentIds },
+        },
+      });
+
+      return {
+        assignedCount: validStudentIds.length,
+        assignedUserIds: validStudentIds,
+      };
+    });
   }
 }
 

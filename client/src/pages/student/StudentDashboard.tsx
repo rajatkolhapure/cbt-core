@@ -284,8 +284,8 @@ export const StudentDashboard: React.FC = () => {
         {/* Top Masthead */}
         <header className="flex min-h-[86px] items-center justify-between border-b border-[#263044]/70">
           <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-xl border border-[#D4A373]/35 bg-[#D4A373]/10 text-[#D4A373] shadow-sm">
-              <FileText size={19} />
+            <div className="h-10 w-auto flex items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="h-10 w-auto max-w-[140px] object-contain" />
             </div>
             <div>
               <p className="font-bold tracking-tight text-base sm:text-lg text-[#F3F4F6]">

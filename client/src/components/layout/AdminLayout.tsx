@@ -6,10 +6,10 @@ import {
   HelpCircle,
   FileSpreadsheet,
   Users,
+  UserCheck,
   BarChart3,
   ShieldAlert,
   LogOut,
-  GraduationCap,
   Radio,
 } from 'lucide-react';
 
@@ -29,7 +29,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Question Bank', path: '/admin/questions', icon: HelpCircle },
     { label: 'Exam Builder', path: '/admin/exams', icon: FileSpreadsheet },
     { label: 'Students', path: '/admin/students', icon: Users },
-    { label: 'Assign Test', path: '/admin/assign-test', icon: FileSpreadsheet },
+    { label: 'Assign Test', path: '/admin/assign-test', icon: UserCheck },
     { label: 'Results & Analytics', path: '/admin/results', icon: BarChart3 },
     { label: 'Integrity Logs', path: '/admin/integrity', icon: ShieldAlert },
   ];
@@ -40,8 +40,8 @@ export const AdminLayout: React.FC = () => {
       <header className="bg-[#1A2B4C] text-[#FBF9F5] border-b border-[#1C1D21] sticky top-0 z-50 shadow-tactile">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-[#C88A2D] text-[#1C1D21] border border-[#1C1D21] flex items-center justify-center font-bold shadow-xs">
-              <GraduationCap className="w-5 h-5 text-[#1C1D21]" />
+            <div className="h-9 w-auto flex items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="h-9 w-auto max-w-[120px] object-contain" />
             </div>
             <div>
               <span className="font-serif font-bold text-base sm:text-lg tracking-tight text-white">

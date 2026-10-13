@@ -212,6 +212,16 @@ export const RegisterPage: React.FC = () => {
       {/* Soft Ambient Radial Canvas Wash */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#131B2A_0%,_#0D111A_45%,_#0B0F17_85%)] opacity-85 pointer-events-none" />
 
+      {/* Top Left Brand Logo */}
+      <Link to="/" className="absolute top-6 left-6 z-20 flex items-center gap-3 group">
+        <div className="h-9 w-auto flex items-center justify-center transition group-hover:opacity-90">
+          <img src="/logo.png" alt="Logo" className="h-8 w-auto max-w-[120px] object-contain" />
+        </div>
+        <span className="font-bold tracking-tight text-sm sm:text-base text-[#F3F4F6] group-hover:text-white transition">
+          Testing portal
+        </span>
+      </Link>
+
       {/* ========================================================= */}
       {/* LEFT 60% STAGE: Mascot Stage (Desktop)                    */}
       {/* ========================================================= */}

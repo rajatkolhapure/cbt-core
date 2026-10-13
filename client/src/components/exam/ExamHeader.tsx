@@ -34,8 +34,8 @@ export const ExamHeader: React.FC<ExamHeaderProps> = ({
     <header className="bg-[#1A2B4C] text-[#FBF9F5] px-3.5 sm:px-6 py-2.5 flex items-center justify-between gap-3 select-none shrink-0 font-sans border-b border-[#1C1D21] shadow-tactile">
       {/* Left: Exam Title */}
       <div className="flex items-center gap-2.5 min-w-0">
-        <div className="w-7 h-7 bg-[#C88A2D] text-[#1C1D21] border border-[#1C1D21] flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs">
-          CBT
+        <div className="h-7 w-auto flex items-center justify-center shrink-0">
+          <img src="/logo.png" alt="Logo" className="h-7 w-auto max-w-[100px] object-contain" />
         </div>
         <h1 className="font-serif text-xs sm:text-sm font-bold text-white truncate max-w-[140px] sm:max-w-xs md:max-w-md">
           {examTitle || 'Standardized Examination'}

@@ -118,28 +118,41 @@ export const ExamManagementPage: React.FC = () => {
     setSections(copy);
   };
 
-  const handleOpenEdit = (exam: Exam) => {
-    setEditingExam(exam);
-    setTitle(exam.title);
-    setDescription(exam.description || '');
-    setDuration(exam.duration);
-    setExamEnv(exam.examEnvironment);
-    setAllowReview(exam.allowReview);
-    setShowResultImmediately(exam.showResultImmediately);
-    setShuffleQuestions(exam.shuffleQuestions);
+  const handleOpenEdit = async (exam: Exam) => {
+    try {
+      const res = await api.get(`/exams/${exam.id}`);
+      const fullExam = res.data.exam || exam;
+      setEditingExam(fullExam);
+      setTitle(fullExam.title);
+      setDescription(fullExam.description || '');
+      setDuration(fullExam.duration);
+      setExamEnv(fullExam.examEnvironment);
+      setAllowReview(fullExam.allowReview);
+      setShowResultImmediately(fullExam.showResultImmediately);
+      setShuffleQuestions(fullExam.shuffleQuestions);
 
-    if (exam.sections) {
-      setSections(
-        exam.sections.map((sec) => ({
-          subjectId: sec.subjectId,
-          name: sec.name,
-          questionCount: sec.questionCount,
-          marksPerQuestion: sec.marksPerQuestion,
-          negativeMarksPerQuestion: sec.negativeMarksPerQuestion,
-          allowSectionJump: sec.allowSectionJump,
-          selectedQuestionIds: sec.questions?.map((q: any) => q.question?.id || q.questionId) || [],
-        }))
-      );
+      if (fullExam.sections) {
+        setSections(
+          fullExam.sections.map((sec: any) => ({
+            subjectId: sec.subjectId,
+            name: sec.name,
+            questionCount: sec.questionCount,
+            marksPerQuestion: sec.marksPerQuestion,
+            negativeMarksPerQuestion: sec.negativeMarksPerQuestion,
+            allowSectionJump: sec.allowSectionJump,
+            selectedQuestionIds: sec.questions?.map((q: any) => q.question?.id || q.questionId) || [],
+          }))
+        );
+      }
+    } catch {
+      setEditingExam(exam);
+      setTitle(exam.title);
+      setDescription(exam.description || '');
+      setDuration(exam.duration);
+      setExamEnv(exam.examEnvironment);
+      setAllowReview(exam.allowReview);
+      setShowResultImmediately(exam.showResultImmediately);
+      setShuffleQuestions(exam.shuffleQuestions);
     }
     setIsBuilderOpen(true);
   };
@@ -211,15 +224,22 @@ export const ExamManagementPage: React.FC = () => {
     }
   };
 
-  const handleOpenAssign = (exam: Exam) => {
+  const handleOpenAssign = async (exam: Exam) => {
     setSelectedExamForAssign(exam);
-    setSelectedStudentIds([]);
+    try {
+      const res = await api.get(`/exams/${exam.id}`);
+      const assignedUsers = res.data.exam?.assignments || [];
+      const assignedIds = assignedUsers.map((a: any) => a.user?.id || a.userId);
+      setSelectedStudentIds(assignedIds);
+    } catch {
+      setSelectedStudentIds([]);
+    }
     setIsAssignOpen(true);
   };
 
   const handleAssignSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedExamForAssign || selectedStudentIds.length === 0) return;
+    if (!selectedExamForAssign) return;
 
     try {
       await api.post(`/exams/${selectedExamForAssign.id}/assign`, {
@@ -228,7 +248,7 @@ export const ExamManagementPage: React.FC = () => {
       setIsAssignOpen(false);
       setSelectedExamForAssign(null);
       fetchExams();
-      alert(`Exam successfully assigned to ${selectedStudentIds.length} candidate(s).`);
+      alert(`Candidate assignments updated successfully (${selectedStudentIds.length} candidate(s) assigned).`);
     } catch (err: any) {
       alert(err.response?.data?.error || 'Failed to assign candidates');
     }
@@ -681,13 +701,19 @@ export const ExamManagementPage: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <span className="font-semibold text-slate-700">Enrolled Students ({students.length})</span>
+                <span className="font-semibold text-slate-700">
+                  Enrolled Students ({selectedStudentIds.length} of {students.length} selected)
+                </span>
                 <button
                   type="button"
-                  onClick={() => setSelectedStudentIds(students.map((s) => s.id))}
+                  onClick={() =>
+                    setSelectedStudentIds(
+                      selectedStudentIds.length === students.length ? [] : students.map((s) => s.id)
+                    )
+                  }
                   className="text-blue-600 hover:text-blue-800 font-semibold text-[11px]"
                 >
-                  Select All
+                  {selectedStudentIds.length === students.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
 
@@ -721,21 +747,25 @@ export const ExamManagementPage: React.FC = () => {
                 })}
               </div>
 
-              <div className="pt-3 border-t border-gray-200 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAssignOpen(false)}
-                  className="px-3 py-1.5 border border-gray-300 rounded text-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={selectedStudentIds.length === 0}
-                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded disabled:opacity-50"
-                >
-                  Assign ({selectedStudentIds.length}) Candidates
-                </button>
+              <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500 font-mono">
+                  {selectedStudentIds.length === 0 ? 'Will unassign all candidates' : `${selectedStudentIds.length} candidate(s) will have access`}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsAssignOpen(false)}
+                    className="px-3 py-1.5 border border-gray-300 rounded text-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded"
+                  >
+                    Save Assignment ({selectedStudentIds.length})
+                  </button>
+                </div>
               </div>
             </form>
           </div>

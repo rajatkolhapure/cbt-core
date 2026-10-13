@@ -81,7 +81,12 @@ export const OfficialScorecardModal: React.FC<OfficialScorecardModalProps> = ({
         {/* Printable Scorecard Document - Monochrome / Slate & Black Theme */}
         <div className="p-8 overflow-y-auto space-y-6 text-slate-900 bg-white text-xs print:p-0 print:overflow-visible">
           {/* Document Header */}
-          <div className="text-center border-b-2 border-black pb-4 space-y-1">
+          <div className="text-center border-b-2 border-black pb-4 space-y-2">
+            <div className="flex justify-center">
+              <div className="h-10 w-auto flex items-center justify-center">
+                <img src="/logo.png" alt="Logo" className="h-10 w-auto max-w-[140px] object-contain" />
+              </div>
+            </div>
             <div className="font-bold text-[11px] uppercase tracking-widest text-slate-600">
               Computer-Based Examination Console
             </div>

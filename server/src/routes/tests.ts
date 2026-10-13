@@ -45,9 +45,12 @@ const getStudentStatsHandler = async (req: AuthRequest, res: Response, next: Nex
       return res.status(404).json({ error: 'Student record not found' });
     }
 
-    // 2. Query Neon Database for exact assigned tests
+    // 2. Query Neon Database for exact assigned tests (only published exams)
     const assignments = await prisma.examAssignment.findMany({
-      where: { userId },
+      where: {
+        userId,
+        exam: { isPublished: true },
+      },
       include: {
         exam: {
           select: {
@@ -193,6 +196,7 @@ const buildAssignedTestsList = async (userId: string) => {
     where: {
       userId,
       status: { not: AssignmentStatus.completed },
+      exam: { isPublished: true },
     },
     include: {
       exam: {
@@ -303,7 +307,7 @@ router.get('/resume-check/:examId', async (req: AuthRequest, res: Response, next
     const userId = req.user?.userId || req.user?.id;
     if (!userId) return res.status(401).json({ error: 'Unauthorized candidate session' });
 
-    const { examId } = req.params;
+    const examId = req.params.examId as string;
 
     const assignment = await prisma.examAssignment.findUnique({
       where: { examId_userId: { examId, userId } },

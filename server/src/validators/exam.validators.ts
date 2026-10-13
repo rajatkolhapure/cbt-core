@@ -33,7 +33,7 @@ export const createExamSchema = z.object({
 export const updateExamSchema = createExamSchema.partial();
 
 export const assignExamSchema = z.object({
-  studentIds: z.array(z.string().uuid()).min(1, 'At least one student ID is required'),
+  studentIds: z.array(z.string().uuid()),
 });
 
 export type CreateExamInput = z.infer<typeof createExamSchema>;
