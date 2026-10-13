@@ -89,25 +89,6 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
 
   return (
     <div className={`relative flex flex-col items-center select-none ${className}`}>
-      <style>{`
-        @keyframes chibiFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
-        @keyframes shadowBreathe {
-          0%, 100% { transform: scale(1); opacity: 0.35; }
-          50% { transform: scale(0.9); opacity: 0.2; }
-        }
-        .animate-chibi-float {
-          animation: chibiFloat 4s ease-in-out infinite;
-          transform-origin: center bottom;
-        }
-        .animate-shadow-breathe {
-          animation: shadowBreathe 4s ease-in-out infinite;
-          transform-origin: center;
-        }
-      `}</style>
-
       <svg
         ref={svgRef}
         viewBox="0 0 320 340"
@@ -157,11 +138,11 @@ export const FoxCadetMascot: React.FC<FoxCadetMascotProps> = ({
           rx="76"
           ry="10"
           fill="#05070B"
-          className="animate-shadow-breathe"
+          opacity="0.35"
         />
 
-        {/* --- MAIN CHIBI FLOAT GROUP (1.5:1 Head to Torso Ratio) --- */}
-        <g className="animate-chibi-float">
+        {/* --- MAIN CHIBI GROUP (Still & Grounded) --- */}
+        <g>
 
           {/* ========================================================= */}
           {/* 1. COMPACT SUITED TORSO & SPACE COLLAR                     */}
